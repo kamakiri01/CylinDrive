@@ -1,6 +1,6 @@
 enchant();
 window.onload = function(){
-    var core = new Core(512, 512);
+    var core = new Core(640, 640);
     core.fps = 30;
     core.score = 0;
     core.preload();
@@ -19,12 +19,16 @@ var init = function(){
     //フラグ0
     core.keyEvent[0] = {
         inputUp: function(){
+            Camera360.instance.rotX(Math.PI/45);
         },
         inputDown: function(){
+            Camera360.instance.rotX(-Math.PI/45);
         },
         inputLeft: function(){
+            Camera360.instance.rotZ(Math.PI/45);
         },
         inputRight: function(){
+            Camera360.instance.rotZ(-Math.PI/45);
         }
     }
 }
@@ -42,7 +46,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             upVectorX: 0,
             upVectorY: 1,
             upVectorZ: 0
-        }
+        };
         var camera = new Camera360(cameraConf);
 
 
@@ -50,6 +54,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             var dot = new Dot();
             Sprite360.add360Methods(dot);
             this.addChild(dot);
+            //pxをここで定義している。ステージ構造ジェネレータに任せたい
             this.px = this.x;
             this.py = this.y;
             dot.addEventListener('enterframe', function(){
@@ -63,11 +68,14 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                 //
                 if(core.input.up){
                     core.keyEvent[0].inputUp();
-                }else if(core.input.down){
+                }
+                if(core.input.down){
                     core.keyEvent[0].inputDown();
-                }else if(core.input.left){
+                }
+                if(core.input.left){
                     core.keyEvent[0].inputLeft();
-                }else if(core.input.right){
+                }
+                if(core.input.right){
                     core.keyEvent[0].inputRight();
                 }
 

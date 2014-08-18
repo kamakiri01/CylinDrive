@@ -53,6 +53,7 @@ var Dot = enchant.Class.create(enchant.Sprite,{
 
         dots.push(this);
 
+        //360向け運動最適化処理
         this.addEventListener('enterframe',function(){
             this.px += this.accX;
             this.py += this.accY;
