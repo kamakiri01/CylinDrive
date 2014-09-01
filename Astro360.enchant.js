@@ -13,19 +13,36 @@ IMAGE_PRELOAD.push(IMAGE_PLAYER_BASE);
 IMAGE_PRELOAD.push(IMAGE_UI_ARROW);
 IMAGE_PRELOAD.push(IMAGE_BULLET);
 //PlayerBaseの画像サイズは引数でSpriteと同様に指定する
-var PlayerBase = enchant.Class.create(enchant.Sprite, {
+var PlayerBase = enchant.Class.create(Geo.Circle, {
         initialize: function(){
-            enchant.Sprite.call(this, 32, 32);
-            this.image = enchant.Core.instance.assets[IMAGE_PLAYER_BASE];
+            Geo.Circle.call(this, 32);
+            this.targX = this.x;
+            this.targY = this.y;
+            this.addEventListener('enterframe', function(){
+                    this.loop();
+            });
         },
-        receiveTouchEvent: function(e, ui_width){
-            var hereToTouchX = e.x - this.x;
-            var hereToTouchY = e.y - this.y;
-            this.moveApplyX(hereToTouchX,  ui_width);
-            this.moveApplyY(hereToTouchY);
+        loop: function(){
+            var hereToTouchX = this.targX - this.x;
+            var hereToTouchY = this.targY - this.y;
+            this.moveApplyX(hereToTouchX/2);
+            this.moveApplyY(hereToTouchY/2);
         },
-        moveApplyX: function(n, w){
-            this.x += n - w;
+        shot: function(e){
+            console.log("shot");
+        },
+        //タッチスタートでショット発射、その座標向けて移動
+        receiveTouchStart: function(e){
+            this.shot(e);
+            this.targX = e.x + this.width/2;
+            this.targY = e.y - this.height/2;
+        },
+        receiveTouchMove: function(e){
+            this.targX = e.x + this.width/2;
+            this.targY = e.y - this.height/2;
+        },
+        moveApplyX: function(n){
+            this.x += n - UI_WIDTH;
         },
         moveApplyY: function(n){
             this.y += n;
@@ -53,6 +70,34 @@ var TestEnemyBase360 = enchant.Class.create(EnemyBase360, {
             });
         }
 });
+var SimpleEnemy360 = enchant.Class.create(EnemyBase360, {
+        initialize: function(posObj, velObj, accObj){
+            EnemyBase360.call(this, 32, 32);
+            this.image = enchant.Core.instance.assets[IMAGE_PLAYER_BASE];
+            this.frame = 7;
+            this.scaleX = -1;
+            this.px = posObj.x;
+            this.py = posObj.y;
+            this.pz = posObj.z;
+            this.velX = velObj.x;
+            this.velY = velObj.y;
+            this.velZ = velObj.z;
+            this.accX = accObj.x;
+            this.accY = accObj.y;
+            this.accZ = accObj.z;
+        },
+        setMyMotion: function(){
+            this.addEventListener('enterframe', function(){
+                    this.velX += this.accX;
+                    this.velY += this.accY;
+                    this.velZ += this.accZ;
+                    this.px += this.velX;
+                    this.py += this.velY;
+                    this.pz += this.velZ;
+            });
+        }
+});
+
 
 var BulletBase = enchant.Class.create(EnemyBase360, {
         initialize: function(wx, wy){
@@ -86,6 +131,16 @@ var FanBullet = enchant.Class.create(BulletBase, {
         });
     }
 });
+
+//敵がふつうのショットを撃つ
+var createNormalBullet = function(master, spd){
+    var b = new TestBulletBase();
+    b.px = master.px;
+    b.py = master.py;
+    b.pz = master.pz;
+    b.setMyMotion();
+    master.parentNode.addChild(b);
+};
 //放射状の弾を撃つ
 //発射点、発射数、散乱角度、射出速度
 var createRippleBullet = function(master, num, rad, spd){
