@@ -145,6 +145,7 @@ var createNormalBullet = function(master, spd){
 //発射点、発射数、散乱角度、射出速度
 var createRippleBullet = function(master, num, rad, spd){
     var c = Camera360.instance;
+    var core = enchant.Core.instance;
     var theta = c.theta;
     var mx = master.x;
     var my = master.y;
@@ -157,7 +158,7 @@ var createRippleBullet = function(master, num, rad, spd){
         var bax = Math.cos(currentRad) * spd;
         var bay = Math.sin(currentRad) * spd;
         console.log(bax + ", " + bay);
-        var aPos = Camera360.setReferenceFromViewPosition(bax, bay);
+        var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
         b.pax = - aPos.x;
         b.pay = - aPos.y;// * Math.cos(theta);
         b.paz = - aPos.z; //;* Math.sin(theta);

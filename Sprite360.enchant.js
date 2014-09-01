@@ -24,7 +24,7 @@ Sprite360.loop = function(){
     var axis = Camera360.worldToScreen(this.px, this.py, this.pz);
     this.x = axis.x;
     this.y = axis.y;
-    this.z = axis.z;
+    this.z = axis.z; // will not use.
 };
 //その時点での座標をp座標系に登録する
 //カメラに対して鉛直に射影すべき。
@@ -137,8 +137,10 @@ Camera360.setReferenceFromViewPosition = function(x, y){
     var px = x;
 //    var py = Math.cos(theta) * d + core.height/2;// - Math.sin(theta) * core.height/2;
 //    var pz = Math.sin(theta) * d;
-    var py = ( Math.cos(theta) + 1/2 ) * scale * core.height;
-    var pz = ( Math.sin(theta) - 1/2 ) * scale * core.height;
+//    var py = ( Math.cos(theta) + 1/2 ) * scale * core.height;
+//    var pz = ( Math.sin(theta) - 1/2 ) * scale * core.height;
+    var py = Math.cos(theta) * d;
+    var pz = Math.sin(theta) * d;
 
     //x軸沿いにカメラがyz平面を正円軌道で回転する場合に限る
     //カメラ回転軸と平面の回転軸が等しいことが条件

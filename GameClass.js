@@ -1,6 +1,5 @@
 var CORE_WIDTH = 640;
 var CORE_HEIGHT = 640;
-var PLAYWINDOW_HEIGHT = 500;
 var UI_WIDTH = 70;
 
 var core = enchant.Core.instance;
@@ -11,10 +10,10 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         var core = enchant.Core.instance;
         var cameraConf = {
             x: core.width / 2,
-            y: core.height / 2,
-            z: -core.height * 10,
+            y: 0,
+            z: -core.height * 5,
             centerX: core.width / 2,
-            centerY: core.height / 2,
+            centerY: 0,
             centerZ: 0,
             upVectorX: 0,
             upVectorY: -1,
@@ -95,23 +94,23 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                     var vel = {x: -1 , y: 0};
                     var acc = {x: 0,   y: 0};
  //                   gemEnemy(1, 0, pos, vel, acc);
-//                    var e = new TestEnemyBase360();
-//                    e.x = CORE_WIDTH;
-//                    e.y = CORE_HEIGHT * Math.random() / 2;
-//                    Camera360.setCurrentNormalPosition(e);
-//                    e.addEventListener('enterframe', function(){
-//                            this.px -= 0.01;
-//                            //こまめにふつうのショット
-//                            if(this.age % 50 === 0){
-//                                createNormalBullet(this);
-//                            }
-//                            //たまに放射状にうつ
-//                            if(this.age % 90 === 0){
-//                                createRippleBullet(e, 10, 30, 4);
-//                            }
-//                    });
-//                    e.setMyMotion();
-//                    mainWindow.addChild(e);
+                    var e = new TestEnemyBase360();
+                    e.x = CORE_WIDTH;
+                    e.y = CORE_HEIGHT * Math.random() / 2;
+                    Camera360.setCurrentNormalPosition(e);
+                    e.addEventListener('enterframe', function(){
+                            this.px -= 0.01;
+                            //こまめにふつうのショット
+                            if(this.age % 50 === 0){
+                                createNormalBullet(this);
+                            }
+                            //たまに放射状にうつ
+                            if(this.age % 90 === 0){
+                                createRippleBullet(e, 10, 30, 4);
+                            }
+                    });
+                    e.setMyMotion();
+                    mainWindow.addChild(e);
                 }
         });
         //キーイベント入力の受付(デバッグ）
