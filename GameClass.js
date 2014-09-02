@@ -38,8 +38,21 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         uiBg.image = core.assets[IMAGE_UI_ARROW];
         uiWindow.addChild(uiBg);
         var p = new PlayerBase();
+        p.x = 150;
+        p.y = CORE_HEIGHT /2;
+        p.targX = 150;
+        p.targY = CORE_HEIGHT /2;
         mainWindow.addChild(p);
-        
+        //常時マウス位置を取得
+        window.document.onmousemove = function(e){
+            var e2x = (e.x +0) / enchant.Core.instance.scale;
+            var e2y  =e.y / enchant.Core.instance.scale; 
+            var obj = {x: e2x, y: e2y};
+            p.receiveTouchMove(obj);
+            console.log(e.x);
+        }
+        uiBg.addEventListener('enterframe', function(e){
+        });
         //メイン画面のタッチイベントを自機に送る
         mainWindow.addEventListener('touchstart', function(e){
                 p.receiveTouchStart(e);
@@ -131,27 +144,27 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                 }
         });
         //ドット生成で座標変換の確認用メソッド
-        this.addEventListener('touchstart', function(){
-                for(var i=0;i<50;i++){
-                    var dot = new Dot();
-                    Sprite360.add360Methods(dot);
-                    mainWindow.addChild(dot);
-                    if(i %2 !== 0){
-                        dot.x = i * enchant.Core.instance.width/50;
-                        dot.y = i * enchant.Core.instance.height/50;
-                    }
-                    var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
-                    dot.px = pos.x;
-                    dot.py = pos.y;
-                    dot.pz = pos.z;
-                    dot.accX = 0;
-                    dot.accY = 0;
-                    dot.addEventListener('enterframe', function(){
-                            this.px += this.accX;
-                            this.py += this.accY;
-                    });
-                }
-        })
+//        this.addEventListener('touchstart', function(){
+//                for(var i=0;i<50;i++){
+//                    var dot = new Dot();
+//                    Sprite360.add360Methods(dot);
+//                    mainWindow.addChild(dot);
+//                    if(i %2 !== 0){
+//                        dot.x = i * enchant.Core.instance.width/50;
+//                        dot.y = i * enchant.Core.instance.height/50;
+//                    }
+//                    var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
+//                    dot.px = pos.x;
+//                    dot.py = pos.y;
+//                    dot.pz = pos.z;
+//                    dot.accX = 0;
+//                    dot.accY = 0;
+//                    dot.addEventListener('enterframe', function(){
+//                            this.px += this.accX;
+//                            this.py += this.accY;
+//                    });
+//                }
+//        })
         init();
     }
 });

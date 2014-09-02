@@ -29,7 +29,10 @@ var PlayerBase = enchant.Class.create(Geo.Circle, {
             this.moveApplyY(hereToTouchY/2);
         },
         shot: function(e){
-            console.log("shot");
+            var s = new PlayerBullet();
+            s.x = this.x;
+            s.y = this.y;
+            this.parentNode.addChild(s);
         },
         //タッチスタートでショット発射、その座標向けて移動
         receiveTouchStart: function(e){
@@ -48,15 +51,58 @@ var PlayerBase = enchant.Class.create(Geo.Circle, {
             this.y += n;
         }
 });
+var PlayerBullet = enchant.Class.create(Geo.Circle, {
+        initialize: function(){
+            Geo.Circle.call(this, 32);
+            this.opacity = 0.5;
+            this.addEventListener('enterframe', function(){
+                    this.loop();
+            });
+        },
+        loop: function(){
+            this.x += 15;
+            this.checkIntersect();
+            if(this.y > CORE_WIDTH){
+                this.remove();
+            }
+        },
+        checkIntersect: function(){
+            this.checkIntersect_(EnemyBase360);
+        },
+        checkIntersect_: function(enemyClassName){
+            var il = enemyClassName.collection.length;
+            var iarray = [];
+            for(var i=0;i<il;i++){
+                if(this.intersect(enemyClassName.collection[i])) {
+                    //破壊エフェクト関数
+                    //破壊はループ後
+                    iarray.push(enemyClassName.collection[i]);
+                }
+            }
+            console.log(iarray.length);
+            for(var i=0;i<iarray.length;i++){
+//                gemParticle(iarray[i]);
+                iarray[i].remove();
+            }
+        }
+});
+
 //敵の共通親クラス
 var EnemyBase360 = enchant.Class.create(Sprite360, {
         initialize: function(wx, wy){
             Sprite360.call(this, wx, wy);
+            var core = enchant.Core.instance;
+            this.addEventListener('enterframe', function(){
+                    if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
+                        console.log("bye");
+                        this.remove();
+                    } 
+            });
         },
         //エネミーの挙動を設定する
         setMyMotion: function(){}
 });
-//適当につくった
+//くまのてき　
 var TestEnemyBase360 = enchant.Class.create(EnemyBase360, {
         initialize: function(){
             EnemyBase360.call(this, 32, 32);
@@ -70,6 +116,8 @@ var TestEnemyBase360 = enchant.Class.create(EnemyBase360, {
             });
         }
 });
+
+
 var SimpleEnemy360 = enchant.Class.create(EnemyBase360, {
         initialize: function(posObj, velObj, accObj){
             EnemyBase360.call(this, 32, 32);
@@ -157,7 +205,6 @@ var createRippleBullet = function(master, num, rad, spd){
         var currentRad = (rad * (i / num - 1/ 2)) * Math.PI/180;
         var bax = Math.cos(currentRad) * spd;
         var bay = Math.sin(currentRad) * spd;
-        console.log(bax + ", " + bay);
         var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
         b.pax = - aPos.x;
         b.pay = - aPos.y;// * Math.cos(theta);
