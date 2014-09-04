@@ -52,7 +52,6 @@ var PlayerBase = enchant.Class.create(Geo.Circle, {
             });
         },
         shot1: function(){
-            console.log("gemS");
             var s = new PlayerBullet();
             s.x = PlayerBase.instance.x;
             s.y = PlayerBase.instance.y;
@@ -62,14 +61,11 @@ var PlayerBase = enchant.Class.create(Geo.Circle, {
             this.shot1();
             if(n-1 > 0){
                 var that = this.shotN;
-                //setTimeout(function(){that(n-1)}, 100);
                 setTimeout("PlayerBase.instance.shotN(" + n + "-1)", 100);
             }
         },
         //タッチスタートでショット発射、その座標向けて移動
         receiveTouchStart: function(e){
-           // var p = this.shotNum(3, this.shot1);
-           // p();
             this.shotN(3);
             this.targX = e.x + this.width/2;
             this.targY = e.y - this.height/2;
@@ -86,17 +82,25 @@ var PlayerBase = enchant.Class.create(Geo.Circle, {
         }
 });
 
-//プレイヤーの丸いショット
-var PlayerBullet = enchant.Class.create(Geo.Circle, {
+//プレイヤーのV文字ショット
+var PlayerBullet = enchant.Class.create(enchant.Sprite, {
         initialize: function(){
-            Geo.Circle.call(this, 32);
+            enchant.Sprite.call(this, 32, 32);
             this.opacity = 0.5;
+            this.compositeOperation = 'lighter';
+            var sf = new enchant.Surface(32, 32);
+            var ctx = sf.context;
+            ctx.beginPath();
+            ctx.scale(1.4, 0.6);
+            ctx.arc(30,35,15,0,Math.PI*2,false);
+            ctx.stroke();
             this.addEventListener('enterframe', function(){
                     this.loop();
             });
+            this.image = sf;
         },
         loop: function(){
-            this.x += 15;
+            this.x += 40;
             this.checkIntersect();
             if(this.y > CORE_WIDTH){
                 this.remove();
@@ -111,47 +115,21 @@ var PlayerBullet = enchant.Class.create(Geo.Circle, {
                 if(this.intersect(enemyClassName.collection[i])) {
                     //破壊エフェクト関数
                     gemParticle(enemyClassName.collection[i]);
-                    enemyClassName.collection[i].remove();;
+                    enemyClassName.collection[i].remove();
                     this.remove();
                     break;
                 }
             }
-//            for(var i=0;i<iarray.length;i++){
-//                gemParticle(iarray[i]);
-//                iarray[i].remove();
-//            }
         }
 });
-var gemParticle = function(e){
-    var scr = 5;
-    for(var i=0;i<10;i++){
-        var d = new Dot();
-        d.age = 0;
-        d.x = e.x;
-        d.y = e.y;
-        d.polarR = Math.round(Math.random()* 2)+Math.random();
-        d.accX = Math.round(scr * Math.cos(d.polarT));
-        d.accY = Math.round(scr * Math.sin(d.polarT));
-        d.addEventListener('enterframe', function(){
-                this.x += this.accX;
-                this.y += this.accY;
-                this.age += 1;
-                if(this.age > 30){
-                    this.remove();
-                }
-        });
-        PlayScene.instance.mainWindow.addChild(d);
-
-    }
-};
-
 //------------------------------------------
 //敵関係のクラス定義
-
+//------------------------------------------
 //敵の共通親クラス
 var EnemyBase360 = enchant.Class.create(Sprite360, {
         initialize: function(wx, wy){
             Sprite360.call(this, wx, wy);
+            this.shotsArray = []; //撃った弾への参照を持っておく
             var core = enchant.Core.instance;
             this.addEventListener('enterframe', function(){
                     if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
@@ -162,33 +140,51 @@ var EnemyBase360 = enchant.Class.create(Sprite360, {
         //エネミーの挙動を設定する
         setMyMotion: function(){}
 });
-//くまのてき　
+//テストで出している雑魚敵
+//ex)
+//var e = new TestEnemyBase360();
+//e.x = CORE_WIDTH;
+//e.y = CORE_HEIGHT;
+//Camera360.setCurrentNormalPosition(e);
+//e.addeventlistener('enterframe', function(){
+//  this.px -= 0.01;
+//  ショットの処理
+//});
+//e.setMyMotion();
+//mainWindow.addChild(e);
 var TestEnemyBase360 = enchant.Class.create(EnemyBase360, {
         initialize: function(){
-            EnemyBase360.call(this, 32, 32);
-            var sf = new Surface(32, 32);
+            EnemyBase360.call(this, 20, 20);
+            var sf = new Surface(20, 20);
             this.image = sf;
             this.sCtx = sf.context;
+            this.sCtx.beginPath();              
+            this.sCtx.strokeStyle='#0000ff';     
+            this.sCtx.moveTo(12, 1);
+            this.sCtx.lineTo(20, 15);
+            this.sCtx.lineTo(4, 15);
+            this.sCtx.closePath();
+            this.sCtx.stroke();
+//            this.sCtx.beginPath();
+//            this.sCtx.clearRect(0,0,32, 32);
+//            this.sCtx.strokeStyle = this.drawColor;
+//            this.sCtx.beginPath();
+//            this.sCtx.arc(16, 16, 16, 0, Math.PI*2, true);
+//            this.sCtx.arc(16, 16, 15, 0, Math.PI*2, false);
+//            this.sCtx.fill();
+//            this.sCtx.closePath();
+//            this.sCtx.stroke();
             this.frame = 7;
-            this.scaleX = -1;
         },
         setMyMotion: function(){
             this.addEventListener('enterframe', function(){
-                    this.sCtx.beginPath();
-                    this.sCtx.clearRect(0,0,32, 32);
-                    this.sCtx.strokeStyle = this.drawColor;
-                    this.sCtx.beginPath();
-                    this.sCtx.arc(16, 16, 16, 0, Math.PI*2, true);
-                    this.sCtx.arc(16, 16, 15, 0, Math.PI*2, false);
-                    this.sCtx.fill();
-                    this.sCtx.closePath();
-                    this.sCtx.stroke();
+                    this.rotation -= 1;
                     this.px -=SPEED_ENEMY0;
             });
         }
 });
-
-//次世代メインエネミー予定
+//実装テストを行う敵クラス
+//任意の初期速度、加速度を持つ
 var SimpleEnemy360 = enchant.Class.create(EnemyBase360, {
         initialize: function(posObj, velObj, accObj){
             EnemyBase360.call(this, 32, 32);
@@ -216,15 +212,13 @@ var SimpleEnemy360 = enchant.Class.create(EnemyBase360, {
             });
         }
 });
-
 //てきのたまベース
 var BulletBase = enchant.Class.create(EnemyBase360, {
         initialize: function(wx, wy){
             EnemyBase360.call(this, wx, wy);
     }
 });
-
-//テストくまのうつたま
+//敵のシングルショット
 var TestBulletBase = enchant.Class.create(BulletBase, {
         initialize: function(){
             BulletBase.call(this, 16, 16);
@@ -237,8 +231,7 @@ var TestBulletBase = enchant.Class.create(BulletBase, {
             });
         }
 });
-
-//扇状に広がる弾
+//敵の扇状に広がる弾
 var FanBullet = enchant.Class.create(BulletBase, {
     initialize: function(){
         BulletBase.call(this, 8, 8);
@@ -253,6 +246,77 @@ var FanBullet = enchant.Class.create(BulletBase, {
         });
     }
 });
+//--------------------
+//インターフェース回りのクラス定義
+
+//回転スライダーのグループ
+var UiBg = enchant.Class.create(enchant.Group, {
+        initialize: function(){
+            enchant.Group.call(this);
+            var bg = new Sprite(UI_WIDTH, CORE_HEIGHT);
+            var sf = new Surface(UI_WIDTH, CORE_HEIGHT);
+            var ctx = sf.context;
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(1, 1, 1, 1)';
+            ctx.fillRect(0, 0, UI_WIDTH, CORE_HEIGHT);
+            ctx.fillStyle = 'rgba(1, 100, 100, 100)';
+            ctx. fillRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
+            bg.image = sf;
+            this.addChild(bg);
+        }
+});
+//背景でぐるぐる回るやつ
+var MainBg = enchant.Class.create(enchant.Group, {
+        initialize: function(){
+            enchant.Group.call(this);
+            var bg = new Sprite(CORE_WIDTH, CORE_HEIGHT);
+            var sf = new Surface(CORE_WIDTH, CORE_HEIGHT);
+            sf.context.beginPath();
+            sf.context.fillStyle = 'rgba(2, 0, 0, 0.2)';
+            sf.context.fillRect(0, 0, CORE_WIDTH, CORE_HEIGHT);
+            bg.image = sf;
+            this.addChild(bg);
+            for(var i=0;i<50;i++){
+                var dot = new Dot();
+                Sprite360.add360Methods(dot);
+                var theta = Math.random() * 2 * Math.PI;
+                dot.px = (Math.random() * CORE_WIDTH * 1.3 - 100) * 20;
+                dot.py = Camera360.instance.z * 10 * Math.cos(theta); //初期値はzなのでこれで良い
+                dot.pz = Camera360.instance.z * 10 * Math.sin(theta);
+                dot.accX = 0;
+                dot.accY = 0;
+                dot.opacity = 0.3;
+                this.addChild(dot);
+            }
+        }
+});
+//破壊でばらまかれるパーティクルの個別クラス
+var breakParticleDot = enchant.Class.create(Dot, {
+    initialize: function(e){
+        Dot.call(this);
+        var scr = 4;
+        this.age = 0;
+        this.x = e.x;
+        this.y = e.y;
+        this.polarR = Math.round(Math.random()* 2)+Math.random();
+        this.accX = Math.round(scr * Math.cos(this.polarT));
+        this.accY = Math.round(scr * Math.sin(this.polarT));
+        this.addEventListener('enterframe', function(){
+                this.x += this.accX;
+                this.y += this.accY;
+                this.age += 1;
+                this.opacity -= 0.1;
+                this.scaleX -= 0.1;
+                this.scaleY -= 0.1;
+                if(this.age > 30){
+                    this.remove();
+                }
+        });
+
+    }
+});
+
+
 
 //-------------------
 //敵の弾発射メソッド
@@ -297,46 +361,10 @@ var createRippleBullet = function(master, num, rad, spd){
     }
 };
 
-//--------------------
-//インターフェース回りのクラス定義
-
-//回転スライダーのグループ
-var UiBg = enchant.Class.create(enchant.Group, {
-        initialize: function(){
-            enchant.Group.call(this);
-            var bg = new Sprite(UI_WIDTH, CORE_HEIGHT);
-            var sf = new Surface(UI_WIDTH, CORE_HEIGHT);
-            var ctx = sf.context;
-            ctx.beginPath();
-            ctx.fillStyle = 'rgba(1, 1, 1, 1)';
-            ctx.fillRect(0, 0, UI_WIDTH, CORE_HEIGHT);
-            ctx.fillStyle = 'rgba(1, 100, 100, 100)';
-            ctx. fillRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
-            bg.image = sf;
-            this.addChild(bg);
-        }
-});
-//背景でぐるぐる回るやつ
-var MainBg = enchant.Class.create(enchant.Group, {
-        initialize: function(){
-            enchant.Group.call(this);
-            var bg = new Sprite(CORE_WIDTH, CORE_HEIGHT);
-            var sf = new Surface(CORE_WIDTH, CORE_HEIGHT);
-            sf.context.beginPath();
-            sf.context.fillStyle = 'rgba(2, 0, 0, 0.2)';
-            sf.context.fillRect(0, 0, CORE_WIDTH, CORE_HEIGHT);
-            bg.image = sf;
-            this.addChild(bg);
-            for(var i=0;i<50;i++){
-                var dot = new Dot();
-                Sprite360.add360Methods(dot);
-                var theta = Math.random() * 2 * Math.PI;
-                dot.px = (Math.random() * CORE_WIDTH * 1.3 - 100) * 20;
-                dot.py = Camera360.instance.z * 10 * Math.cos(theta); //初期値はzなのでこれで良い
-                dot.pz = Camera360.instance.z * 10 * Math.sin(theta);
-                dot.accX = 0;
-                dot.accY = 0;
-                this.addChild(dot);
-            }
-        }
-});
+//座標を入れて破壊のパーティクルを生成する
+var gemParticle = function(e){
+    for(var i=0;i<10;i++){
+        var d = new breakParticleDot(e);
+        PlayScene.instance.mainWindow.addChild(d);
+    }
+};

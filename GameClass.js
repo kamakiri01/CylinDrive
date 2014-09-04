@@ -76,30 +76,6 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         //敵を出しまくる TODO:テストコード
         this.addEventListener('enterframe', function(){
                 if(enchant.Core.instance.currentScene.age === 1){
-//                    for(var i=0;i<4;i++){
-//                        var dot = new Dot();
-//                        if(i === 0){
-//                            dot.x = 10;
-//                            dot.y = 10;
-//                        }else if(i === 1){
-//                            dot.x = 620;
-//                            dot.y = 10;
-//                        }else if(i === 2){
-//                            dot.x = 620;
-//                            dot.y = 620;
-//                        }else if(i === 3){
-//                            dot.x = 10;
-//                            dot.y = 620;
-//                        }
-//                        Sprite360.add360Methods(dot);
-//                        mainWindow.addChild(dot);
-//                        var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
-//                        dot.px = pos.x;
-//                        dot.py = pos.y;
-//                        dot.pz = pos.z;
-//                        dot.accX = 0;
-//                        dot.accY = 0;
-//                    }
                 }
                 //適当に敵を出す
                 if(enchant.Core.instance.currentScene.age %30 === 0){
