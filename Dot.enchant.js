@@ -13,7 +13,7 @@ var Dot = enchant.Class.create(enchant.Sprite,{
         var core = enchant.Core.instance;
         var WIDTH = core.width;
         var HEIGHT =core.height;
-        //再利用できるSurfaceを生成する(色変更に対応するため)
+        //再利用できるSurfaceを生成する(色変更に対応するため)   
         if(Dot.surface === undefined){
             Dot.surface = new enchant.Surface(Dot.colors.length * DOT_SIZE, DOT_SIZE);
             for(var i=0;i<Dot.colors.length * DOT_SIZE;i+=DOT_SIZE){
@@ -75,8 +75,8 @@ var Dot = enchant.Class.create(enchant.Sprite,{
         this.removeEventListener('enterframe', arguments.callee);
     }
 });
-//Dot.colors = ['255,255,255', '255,0,0', '255,165,0', '255,255,0', '0,255,0', '0,0,255', '0,0,128', '128,0,128', '255,255,255'];
-Dot.colors = ['127,135,143','200,200,203','255,40,0']; //グレー、明るいグレー、赤
+Dot.colors = ['255,255,255', '255,0,0', '255,165,0', '255,255,0', '0,255,0', '0,0,255', '0,0,128', '128,0,128', '255,255,255'];
+//Dot.colors = ['127,135,143','200,200,203','255,40,0']; //グレー、明るいグレー、赤
 
 //ドットを撒く
 var DotWindow = enchant.Class.create(enchant.Group, {

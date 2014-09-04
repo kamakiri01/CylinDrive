@@ -1,7 +1,3 @@
-var CORE_WIDTH = 640;
-var CORE_HEIGHT = 640;
-var UI_WIDTH = 70;
-
 var core = enchant.Core.instance;
 var PlayScene = enchant.Class.create(enchant.Scene, {
     initialize: function(){
@@ -20,23 +16,28 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             upVectorZ: 0
         };
         var camera = new Camera360(cameraConf);
+        //メインとUIのグループを定義
         var mainWindow = new enchant.Group();
-        this.mainWindow = mainWindow;
         var uiWindow = new enchant.Group();
+
+        this.mainWindow = mainWindow;
         this.uiWindow = uiWindow;
+
         mainWindow.x = UI_WIDTH;
+
         this.addChild(mainWindow);
         this.addChild(uiWindow);
 
-        var mainBg = new enchant.Sprite(enchant.Core.instance.width, enchant.Core.instance.height *2 /3);
+        var mainBg = new MainBg();
         mainWindow.addChild(mainBg);
+
+        var uiBg = new UiBg();
+        uiWindow.addChild(uiBg);
 
         //タッチ操作用変数
         uiWindow.currentTouchY = 0;
 
-        var uiBg = new enchant.Sprite(UI_WIDTH, CORE_HEIGHT);
-        uiBg.image = core.assets[IMAGE_UI_ARROW];
-        uiWindow.addChild(uiBg);
+        //プレイヤーを出す
         var p = new PlayerBase();
         p.x = 150;
         p.y = CORE_HEIGHT /2;
@@ -49,9 +50,8 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             var e2y  =e.y / enchant.Core.instance.scale; 
             var obj = {x: e2x, y: e2y};
             p.receiveTouchMove(obj);
-            console.log(e.x);
         }
-        uiBg.addEventListener('enterframe', function(e){
+        mainBg.addEventListener('enterframe', function(e){
         });
         //メイン画面のタッチイベントを自機に送る
         mainWindow.addEventListener('touchstart', function(e){
@@ -76,30 +76,30 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         //敵を出しまくる TODO:テストコード
         this.addEventListener('enterframe', function(){
                 if(enchant.Core.instance.currentScene.age === 1){
-                    for(var i=0;i<4;i++){
-                        var dot = new Dot();
-                        if(i === 0){
-                            dot.x = 10;
-                            dot.y = 10;
-                        }else if(i === 1){
-                            dot.x = 620;
-                            dot.y = 10;
-                        }else if(i === 2){
-                            dot.x = 620;
-                            dot.y = 620;
-                        }else if(i === 3){
-                            dot.x = 10;
-                            dot.y = 620;
-                        }
-                        Sprite360.add360Methods(dot);
-                        mainWindow.addChild(dot);
-                        var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
-                        dot.px = pos.x;
-                        dot.py = pos.y;
-                        dot.pz = pos.z;
-                        dot.accX = 0;
-                        dot.accY = 0;
-                    }
+//                    for(var i=0;i<4;i++){
+//                        var dot = new Dot();
+//                        if(i === 0){
+//                            dot.x = 10;
+//                            dot.y = 10;
+//                        }else if(i === 1){
+//                            dot.x = 620;
+//                            dot.y = 10;
+//                        }else if(i === 2){
+//                            dot.x = 620;
+//                            dot.y = 620;
+//                        }else if(i === 3){
+//                            dot.x = 10;
+//                            dot.y = 620;
+//                        }
+//                        Sprite360.add360Methods(dot);
+//                        mainWindow.addChild(dot);
+//                        var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
+//                        dot.px = pos.x;
+//                        dot.py = pos.y;
+//                        dot.pz = pos.z;
+//                        dot.accX = 0;
+//                        dot.accY = 0;
+//                    }
                 }
                 //適当に敵を出す
                 if(enchant.Core.instance.currentScene.age %30 === 0){
@@ -114,12 +114,12 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                     e.addEventListener('enterframe', function(){
                             this.px -= 0.01;
                             //こまめにふつうのショット
-                            if(this.age % 50 === 0){
-                                createNormalBullet(this);
+                            if(this.age % 20 === 0){
+                                createNormalBullet(e);
                             }
                             //たまに放射状にうつ
-                            if(this.age % 90 === 0){
-                                createRippleBullet(e, 10, 30, 4);
+                            if(this.age % 30 === 0){
+                                createRippleBullet(e, 5, 30, 8);
                             }
                     });
                     e.setMyMotion();
