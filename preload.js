@@ -10,3 +10,6 @@ var SPEED_BULLET0 = 10;
 var CORE_WIDTH = 640;
 var CORE_HEIGHT = 640;
 var UI_WIDTH = 70;
+
+var MAIN_BG = "./images/bg.png";
+IMAGE_PRELOAD.push(MAIN_BG);

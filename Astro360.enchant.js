@@ -132,13 +132,18 @@ var EnemyBase360 = enchant.Class.create(Sprite360, {
             this.shotsArray = []; //撃った弾への参照を持っておく
             var core = enchant.Core.instance;
             this.addEventListener('enterframe', function(){
+                    //age++
+                    this.myMotion(this.myMotionArg);
+                    this.myBullet(this.myBulletArg);
                     if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
                         this.remove();
                     } 
             });
         },
-        //エネミーの挙動を設定する
-        setMyMotion: function(){}
+        myMotion: function(){},
+        myMotionArg: {},
+        myBullet: function(){},
+        myBulletArg: {}
 });
 //テストで出している雑魚敵
 //ex)
@@ -159,7 +164,7 @@ var TestEnemyBase360 = enchant.Class.create(EnemyBase360, {
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle='#0000ff';     
+            this.sCtx.strokeStyle='#3333ff';     
             this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
@@ -269,12 +274,17 @@ var UiBg = enchant.Class.create(enchant.Group, {
 var MainBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
             enchant.Group.call(this);
-            var bg = new Sprite(CORE_WIDTH, CORE_HEIGHT);
-            var sf = new Surface(CORE_WIDTH, CORE_HEIGHT);
-            sf.context.beginPath();
-            sf.context.fillStyle = 'rgba(2, 0, 0, 0.2)';
-            sf.context.fillRect(0, 0, CORE_WIDTH, CORE_HEIGHT);
-            bg.image = sf;
+            var bg = new Sprite(CORE_WIDTH*2, CORE_HEIGHT*3);
+            bg.image = enchant.Core.instance.assets[MAIN_BG];
+            bg.opacity = 0.6;
+            bg.addEventListener('enterframe', function(){
+                    this.x -= 1;
+                    if(this.x < -CORE_WIDTH){
+                        this.x += CORE_WIDTH;
+                    }
+                    var dif = (Camera360.instance.theta % Math.PI)/Math.PI;
+                    this.y = (dif * CORE_HEIGHT) - CORE_HEIGHT;
+            });
             this.addChild(bg);
             for(var i=0;i<50;i++){
                 var dot = new Dot();
@@ -312,12 +322,8 @@ var breakParticleDot = enchant.Class.create(Dot, {
                     this.remove();
                 }
         });
-
     }
 });
-
-
-
 //-------------------
 //敵の弾発射メソッド
 
@@ -366,5 +372,25 @@ var gemParticle = function(e){
     for(var i=0;i<10;i++){
         var d = new breakParticleDot(e);
         PlayScene.instance.mainWindow.addChild(d);
+    }
+};
+//任意の敵を1つ生成する
+//生成エネミークラス、生成初期位置、運動関数、運動引数、
+//バレットクラス、バレット関数、バレット引数
+var gemEnemy = function(EnemyClass, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+    var core = enchant.Core.instance;
+    var scene = PlayScene.instance;
+    var len = posArray.length;
+    for(var i=0;i<len;i++){
+        var e = new EnemyClass();
+        e.x = posArray[i].x;
+        e.y = posArray[i].y;
+        Camera360.setCurrentNormalPosition(e);
+        e.myMotion = motionFunc;
+        e.myBullet = bulletFunc;
+        e.addEventListener('enterframe', function(){
+                //recommend empty.
+        });
+        scene.mainWindow.addChild(e);
     }
 };

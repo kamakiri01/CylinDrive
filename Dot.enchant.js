@@ -75,8 +75,10 @@ var Dot = enchant.Class.create(enchant.Sprite,{
         this.removeEventListener('enterframe', arguments.callee);
     }
 });
-Dot.colors = ['255,255,255', '255,0,0', '255,165,0', '255,255,0', '0,255,0', '0,0,255', '0,0,128', '128,0,128', '255,255,255'];
+//Dot.colors = ['255,255,255', '255,0,0', '255,165,0', '255,255,0', '0,255,0', '0,0,255', '0,0,128', '128,0,128', '255,255,255'];
 //Dot.colors = ['127,135,143','200,200,203','255,40,0']; //グレー、明るいグレー、赤
+Dot.colors = ['0, 255, 255', '51, 255, 51', '204, 255, 204'];
+
 
 //ドットを撒く
 var DotWindow = enchant.Class.create(enchant.Group, {

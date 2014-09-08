@@ -27,11 +27,6 @@ Sprite360.loop = function(){
     this.z = axis.z; // will not use.
 };
 //その時点での座標をp座標系に登録する
-//カメラに対して鉛直に射影すべき。
-//エンティティ作成時に必要になるので用意すべき。
-    //インスタンス生成時に3次元座標を指定すべき
-//add360Methodsは最初から360対応できているクラスには適用不要にすべき
-//callでは呼びたくなかった
 Sprite360.add360Methods = function(targ){
     targ.px = targ.x;
     targ.py = targ.y;

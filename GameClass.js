@@ -91,11 +91,11 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                             this.px -= 0.01;
                             //こまめにふつうのショット
                             if(this.age % 20 === 0){
-                                createNormalBullet(e);
+ //                               createNormalBullet(e);
                             }
                             //たまに放射状にうつ
                             if(this.age % 30 === 0){
-                                createRippleBullet(e, 5, 30, 8);
+                                createRippleBullet(e, 5, 30, 18);
                             }
                     });
                     e.setMyMotion();
@@ -119,28 +119,6 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                     core.keyEvent[0].inputRight();
                 }
         });
-        //ドット生成で座標変換の確認用メソッド
-//        this.addEventListener('touchstart', function(){
-//                for(var i=0;i<50;i++){
-//                    var dot = new Dot();
-//                    Sprite360.add360Methods(dot);
-//                    mainWindow.addChild(dot);
-//                    if(i %2 !== 0){
-//                        dot.x = i * enchant.Core.instance.width/50;
-//                        dot.y = i * enchant.Core.instance.height/50;
-//                    }
-//                    var pos = Camera360.setReferenceFromViewPosition(dot.x, dot.y);
-//                    dot.px = pos.x;
-//                    dot.py = pos.y;
-//                    dot.pz = pos.z;
-//                    dot.accX = 0;
-//                    dot.accY = 0;
-//                    dot.addEventListener('enterframe', function(){
-//                            this.px += this.accX;
-//                            this.py += this.accY;
-//                    });
-//                }
-//        })
         init();
     }
 });
@@ -164,15 +142,3 @@ var init = function(){
     };
 };
 
-//生成数、弾が直線or扇、初期位置、初期速度、等加速度
-var gemEnemy = function(num, bulletType, pos, vel,　acc){
-    var num = 1; //あとでPromise実装を作る
-    var core = enchant.Core.instance;
-    var scene = PlayScene.instance;
-    var posObj = Camera360.setReferenceFromViewPosition(pos.x, pos.y);
-    var velObj = Camera360.setReferenceFromViewPosition(vel.x, vel.y);
-    var accObj = Camera360.setReferenceFromViewPosition(acc.x, acc.y);
-    var e = new SimpleEnemy360(posObj, velObj, accObj);
-    e.setMyMotion();
-    scene.mainWindow.addChild(e);
-};
