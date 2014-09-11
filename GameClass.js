@@ -101,21 +101,23 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
 //                    e.setMyMotion();
 //                    mainWindow.addChild(e);
 //                }
-//        });
+        //  });
+        //テストとして扇状の弾を撃つ敵をランダムに出現させる
         this.addEventListener('enterframe', function(){
                 var scene = enchant.Core.instance.currentScene;
                 if(scene.age % 30 === 0){
                     Astro360.Methods.Enemy.gemEnemy(
-                        Astro360.Enemy.TestEnemyBase360, 
-                        [{x:CORE_WIDTH, y:Math.random()*CORE_HEIGHT/2}], 
-                        Astro360.EnemyMotion.Simple,
-                        {},
-                        Astro360.EnemyBullet.FanBullet,
-                        Astro360.EnemyBulletMotion.RippleShot,
-                        {num: 5, rad: 30, spd: 18}
+                        Astro360.Enemy.TestEnemyBase360,  //一般的なエネミークラス
+                        [{x:CORE_WIDTH, y:Math.random()*CORE_HEIGHT/2}], //右端のどこか 
+                        Astro360.EnemyMotion.Simple, //まっすぐ前進
+                        {}, //前進に引数なし
+                        Astro360.EnemyBullet.FanBullet, //扇状の弾のためのバレットクラス
+                        Astro360.EnemyBulletMotion.RippleShot, //扇状に弾を撃つ
+                        {freq: 20, num: 5, rad: 20, spd: 15} //弾の密度と頻度と投射角度
                     );
                 }
         });
+
 //キーイベント入力の受付(デバッグ）
         this.addEventListener('enterframe', function(){
                 //-----カーソルキーの動作

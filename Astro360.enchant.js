@@ -231,7 +231,8 @@ Astro360.EnemyMotion.Simple = function(enem, argObj){
 };
 
 Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
-    if(enem.age % 30 === 0){
+    var freq = argObj.freq;
+    if(enem.age % freq === 0){
         var c = Camera360.instance;
         var core = enchant.Core.instance;
         var theta = c.theta;
@@ -242,8 +243,6 @@ Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
         var rad = argObj.rad;
         var spd = argObj.spd;
         for(var i=0;i<num;i++){
-
-        console.log("RippleShot");
             var b = new enem.myBulletClass();
             b.px = enem.px;
             b.py = enem.py;
