@@ -36,7 +36,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
 
         //タッチ操作用変数
         uiWindow.currentTouchY = 0;
-
+//------------------------------------------------------
         //プレイヤーを出す
         var p = new Astro360.Player.PlayerBase();
         p.x = 150;
@@ -60,7 +60,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         mainWindow.addEventListener('touchmove', function(e){
                 p.receiveTouchMove(e);
         });
-
+//------------------------------------------------------
         //UIタッチ操作で回転させる
         uiWindow.addEventListener('touchstart', function(e){
                 uiWindow.currentTouchY = e.y;
@@ -73,35 +73,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         uiWindow.addEventListener('touchend', function(e){
                 uiWindow.currentTouchY = 0;
         });
-        //敵を出しまくる TODO:テストコード
-//        this.addEventListener('enterframe', function(){
-//                if(enchant.Core.instance.currentScene.age === 1){
-//                }
-//                //適当に敵を出す
-//                if(enchant.Core.instance.currentScene.age %30 === 0){
-//                    var pos = {x: 300, y: 100};
-//                    var vel = {x: -1 , y: 0};
-//                    var acc = {x: 0,   y: 0};
-// //                   gemEnemy(1, 0, pos, vel, acc);
-//                    var e = new Astro360.Enemy.TestEnemyBase360();
-//                    e.x = CORE_WIDTH;
-//                    e.y = CORE_HEIGHT * Math.random() / 2;
-//                    Camera360.setCurrentNormalPosition(e);
-//                    e.addEventListener('enterframe', function(){
-//                            this.px -= 0.01;
-//                            //こまめにふつうのショット
-//                            if(this.age % 20 === 0){
-// //                               Astro360.Methods.Enemy.createNormalBullet(e);
-//                            }
-//                            //たまに放射状にうつ
-//                            if(this.age % 30 === 0){
-//                               Astro360.Methods.Enemy.createRippleBullet(e, 5, 30, 18);
-//                            }
-//                    });
-//                    e.setMyMotion();
-//                    mainWindow.addChild(e);
-//                }
-        //  });
+//------------------------------------------------------
         //テストとして扇状の弾を撃つ敵をランダムに出現させる
         this.addEventListener('enterframe', function(){
                 var scene = enchant.Core.instance.currentScene;
@@ -117,8 +89,8 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                     );
                 }
         });
-
-//キーイベント入力の受付(デバッグ）
+//------------------------------------------------------
+//キーイベント入力の受付
         this.addEventListener('enterframe', function(){
                 //-----カーソルキーの動作
                 //

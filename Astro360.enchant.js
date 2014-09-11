@@ -5,17 +5,21 @@
  * Astro360で定義されるクラスはSprite360の基本クラスを基にして
  * 実際のクラスを構築する
  */
-var Astro360 = {};
-Astro360.Player = {};
-Astro360.PlayerBullet = {};
-Astro360.Enemy = {};
-Astro360.EnemyBullet = {};
-Astro360.EnemyMotion = {};
-Astro360.EnemyBulletMotion = {};
-Astro360.Methods = {};
-Astro360.Methods.Player = {};
-Astro360.Methods.Enemy = {};
+var Astro360 = {}; //本体オブジェクト
+Astro360.Player = {}; //プレイヤークラス
+Astro360.PlayerBullet = {}; //プレイヤーバレットクラス
+Astro360.Enemy = {}; //エネミークラス
+Astro360.Effect = {}; //エフェクト系クラス
+Astro360.EnemyBullet = {}; //エネミーバレットクラス
+Astro360.EnemyMotion = {}; //エネミーモーション
+Astro360.EnemyBulletMotion = {}; //エネミーバレットモーション
+Astro360.Methods = {}; //各種メソッド
+Astro360.Methods.Player = {}; //プレイヤー関係メソッド
+Astro360.Methods.Enemy = {}; //エネミー関係メソッド
 
+//-------------------------------------------------------
+// Astro360.Player
+//-------------------------------------------------------
 //PlayerBaseの画像サイズは引数でSpriteと同様に指定する
 Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
         initialize: function(){
@@ -91,6 +95,9 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
         }
 });
 
+//-------------------------------------------------------
+// Astro360.PlayerBullet
+//-------------------------------------------------------
 //プレイヤーのV文字ショット(ノーマル）
 Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, {
         initialize: function(){
@@ -135,9 +142,9 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
             }
         }
 });
-//------------------------------------------
-//敵関係のクラス定義
-//------------------------------------------
+//-------------------------------------------------------
+// Astro360.Enemy
+//-------------------------------------------------------
 //敵の共通親クラス(バレットを含む）
 Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
         initialize: function(wx, wy){
@@ -165,14 +172,13 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
 //        myBulletFunc: function(){},
 //        myBulletArg: { configurable: true, value: {configurable: true} }
 });
-
 //バレットを含まない敵の親クラス
 Astro360.Enemy.EnemyBase360Derivative = enchant.Class.create(Astro360.Enemy.EnemyBase360, {
         initialize: function(wx, wy){
             Astro360.Enemy.EnemyBase360.call(this, wx, wy);
     }
 });
-
+//適当な三角形のエネミー（テスト用？）
 Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
@@ -195,7 +201,7 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
             });
         }
 });
-//実装テストを行う敵クラス
+//加速度系実装テストを行う敵クラス
 //任意の初期速度、加速度を持つ
 Astro360.Enemy.SimpleEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(posObj, velObj, accObj){
@@ -225,46 +231,37 @@ Astro360.Enemy.SimpleEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360
         }
 });
 
-Astro360.EnemyMotion.Simple = function(enem, argObj){
-    enem.px -= SPEED_ENEMY0;
-    enem.rotation -= 1;
-};
-
-Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
-    var freq = argObj.freq;
-    if(enem.age % freq === 0){
-        var c = Camera360.instance;
-        var core = enchant.Core.instance;
-        var theta = c.theta;
-        var mx = enem.x;
-        var my = enem.y;
-        var num = argObj.num;
-        console.log(argObj);
-        var rad = argObj.rad;
-        var spd = argObj.spd;
-        for(var i=0;i<num;i++){
-            var b = new enem.myBulletClass();
-            b.px = enem.px;
-            b.py = enem.py;
-            b.pz = enem.pz;
-            var currentRad = (rad * (i / num - 1/ 2)) * Math.PI/180;
-            var bax = Math.cos(currentRad) * spd;
-            var bay = Math.sin(currentRad) * spd;
-            var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
-            b.pax = - aPos.x;
-            b.pay = - aPos.y;// * Math.cos(theta);
-            b.paz = - aPos.z; //;* Math.sin(theta);
-            b.setMyMotion();
-            b.loop(); //座標が00になってしまうのを防ぐ
-            if(enem !== null){
-                enem.parentNode.addChild(b);
-            }
-        }
+//-------------------------------------------------------
+// Astro360.Effect
+//-------------------------------------------------------
+//敵の破壊でばらまかれるパーティクルの個別クラス
+Astro360.Effect.breakParticleDot = enchant.Class.create(Dot, {
+    initialize: function(e){
+        Dot.call(this);
+        var scr = 4;
+        this.age = 0;
+        this.x = e.x;
+        this.y = e.y;
+        this.polarR = Math.round(Math.random()* 2)+Math.random();
+        this.accX = Math.round(scr * Math.cos(this.polarT));
+        this.accY = Math.round(scr * Math.sin(this.polarT));
+        this.addEventListener('enterframe', function(){
+                this.x += this.accX;
+                this.y += this.accY;
+                this.age += 1;
+                this.opacity -= 0.1;
+                this.scaleX -= 0.1;
+                this.scaleY -= 0.1;
+                if(this.age > 30){
+                    this.remove();
+                }
+        });
     }
-};
-
-
-//てきのたまベース
+});
+//-------------------------------------------------------
+//Astro360.EnemyBullet
+//-------------------------------------------------------
+//てきのたまベースクラス
 Astro360.EnemyBullet.BulletBase = enchant.Class.create(Astro360.Enemy.EnemyBase360, {
         initialize: function(wx, wy){
             Astro360.Enemy.EnemyBase360.call(this, wx, wy);
@@ -298,6 +295,128 @@ Astro360.EnemyBullet.FanBullet = enchant.Class.create(Astro360.EnemyBullet.Bulle
         });
     }
 });
+//-------------------------------------------------------
+//Astro360.EnemyMotion
+//-------------------------------------------------------
+//ただまっすぐ進むモーション
+Astro360.EnemyMotion.Simple = function(enem, argObj){
+    enem.px -= SPEED_ENEMY0;
+    enem.rotation -= 1;
+};
+//-------------------------------------------------------
+//Astro360.EnemyBulletMotion
+//-------------------------------------------------------
+Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
+    var freq = argObj.freq;
+    if(enem.age % freq === 0){
+        var c = Camera360.instance;
+        var core = enchant.Core.instance;
+        var theta = c.theta;
+        var mx = enem.x;
+        var my = enem.y;
+        var num = argObj.num;
+        console.log(argObj);
+        var rad = argObj.rad;
+        var spd = argObj.spd;
+        for(var i=0;i<num;i++){
+            var b = new enem.myBulletClass();
+            b.px = enem.px;
+            b.py = enem.py;
+            b.pz = enem.pz;
+            var currentRad = (rad * (i / num - 1/ 2)) * Math.PI/180;
+            var bax = Math.cos(currentRad) * spd;
+            var bay = Math.sin(currentRad) * spd;
+            var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
+            b.pax = - aPos.x;
+            b.pay = - aPos.y;// * Math.cos(theta);
+            b.paz = - aPos.z; //;* Math.sin(theta);
+            b.setMyMotion();
+            b.loop(); //座標が00になってしまうのを防ぐ
+            if(enem !== null){
+                enem.parentNode.addChild(b);
+            }
+        }
+    }
+};
+//-------------------------------------------------------
+// astro360.Methods.Enemy
+//-------------------------------------------------------
+//敵がふつうのショットを撃つ
+Astro360.Methods.Enemy.createNormalBullet = function(master, spd){
+    var b = new Astro360.EnemyBullet.TestBulletBase();
+    b.px = master.px;
+    b.py = master.py;
+    b.pz = master.pz;
+    b.setMyMotion();
+    b.loop();//座標が00になってしまうのを防ぐ
+    if(master.parentNode !== null){
+        master.parentNode.addChild(b);
+    }
+};
+//放射状の弾を撃つ
+//発射点、発射数、散乱角度、射出速度
+Astro360.Methods.Enemy.createRippleBullet = function(master, num, rad, spd){
+    var c = Camera360.instance;
+    var core = enchant.Core.instance;
+    var theta = c.theta;
+    var mx = master.x;
+    var my = master.y;
+    for(var i=0;i<num;i++){
+        var b = new Astro360.EnemyBullet.FanBullet();
+        b.px = master.px;
+        b.py = master.py;
+        b.pz = master.pz;
+        var currentRad = (rad * (i / num - 1/ 2)) * Math.PI/180;
+        var bax = Math.cos(currentRad) * spd;
+        var bay = Math.sin(currentRad) * spd;
+        var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
+        b.pax = - aPos.x;
+        b.pay = - aPos.y;// * Math.cos(theta);
+        b.paz = - aPos.z; //;* Math.sin(theta);
+        b.setMyMotion();
+        b.loop(); //座標が00になってしまうのを防ぐ
+        if(master.parentNode !== null){
+            master.parentNode.addChild(b);
+        }
+    }
+};
+//座標を入れて破壊のパーティクルを生成する
+Astro360.Methods.Enemy.gemParticle = function(e){
+    for(var i=0;i<10;i++){
+        var d = new Astro360.Effect.breakParticleDot(e);
+        PlayScene.instance.mainWindow.addChild(d);
+    }
+};
+//任意の敵を1つ生成する
+//生成エネミークラス、生成初期位置、運動関数、運動引数、
+//バレットクラス、バレット関数、バレット引数
+//
+Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+    var core = enchant.Core.instance;
+    var scene = PlayScene.instance;
+    var len = posArray.length;
+    for(var i=0;i<len;i++){
+        var e = new EnemyClass();
+        e.x = posArray[i].x;
+        e.y = posArray[i].y;
+        Camera360.setCurrentNormalPosition(e);
+        e.myBulletClass = BulletClass;
+        e.myMotionFunc = motionFunc;
+        e.myBulletFunc = bulletFunc;
+        e.myMotionArg = motionArg;
+        e.myBulletArg = bulletArg;
+        console.log(e.myBulletArg);
+        e.addEventListener('enterframe', function(){
+                //recommend empty.
+        });
+        scene.mainWindow.addChild(e);
+    }
+};
+
+
+
+
+
 //--------------------
 //インターフェース回りのクラス定義
 
@@ -347,108 +466,3 @@ var MainBg = enchant.Class.create(enchant.Group, {
             }
         }
 });
-//敵の破壊でばらまかれるパーティクルの個別クラス
-Astro360.Enemy.breakParticleDot = enchant.Class.create(Dot, {
-    initialize: function(e){
-        Dot.call(this);
-        var scr = 4;
-        this.age = 0;
-        this.x = e.x;
-        this.y = e.y;
-        this.polarR = Math.round(Math.random()* 2)+Math.random();
-        this.accX = Math.round(scr * Math.cos(this.polarT));
-        this.accY = Math.round(scr * Math.sin(this.polarT));
-        this.addEventListener('enterframe', function(){
-                this.x += this.accX;
-                this.y += this.accY;
-                this.age += 1;
-                this.opacity -= 0.1;
-                this.scaleX -= 0.1;
-                this.scaleY -= 0.1;
-                if(this.age > 30){
-                    this.remove();
-                }
-        });
-    }
-});
-//-------------------
-//敵の弾発射メソッド
-
-//敵がふつうのショットを撃つ
-Astro360.Methods.Enemy.createNormalBullet = function(master, spd){
-    var b = new Astro360.EnemyBullet.TestBulletBase();
-    b.px = master.px;
-    b.py = master.py;
-    b.pz = master.pz;
-    b.setMyMotion();
-    b.loop();//座標が00になってしまうのを防ぐ
-    if(master.parentNode !== null){
-        master.parentNode.addChild(b);
-    }
-};
-//放射状の弾を撃つ
-//発射点、発射数、散乱角度、射出速度
-Astro360.Methods.Enemy.createRippleBullet = function(master, num, rad, spd){
-    var c = Camera360.instance;
-    var core = enchant.Core.instance;
-    var theta = c.theta;
-    var mx = master.x;
-    var my = master.y;
-    for(var i=0;i<num;i++){
-        var b = new Astro360.EnemyBullet.FanBullet();
-        b.px = master.px;
-        b.py = master.py;
-        b.pz = master.pz;
-        var currentRad = (rad * (i / num - 1/ 2)) * Math.PI/180;
-        var bax = Math.cos(currentRad) * spd;
-        var bay = Math.sin(currentRad) * spd;
-        var aPos = Camera360.setReferenceFromViewPosition(bax, bay + core.height/2); //TODO y座標はmasterが中心なのでリファレンス計算の高さ補正を相殺するために半分足す
-        b.pax = - aPos.x;
-        b.pay = - aPos.y;// * Math.cos(theta);
-        b.paz = - aPos.z; //;* Math.sin(theta);
-        b.setMyMotion();
-        b.loop(); //座標が00になってしまうのを防ぐ
-        if(master.parentNode !== null){
-            master.parentNode.addChild(b);
-        }
-    }
-};
-
-//座標を入れて破壊のパーティクルを生成する
-Astro360.Methods.Enemy.gemParticle = function(e){
-    for(var i=0;i<10;i++){
-        var d = new Astro360.Enemy.breakParticleDot(e);
-        PlayScene.instance.mainWindow.addChild(d);
-    }
-};
-//任意の敵を1つ生成する
-//生成エネミークラス、生成初期位置、運動関数、運動引数、
-//バレットクラス、バレット関数、バレット引数
-//
-Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
-    var core = enchant.Core.instance;
-    var scene = PlayScene.instance;
-    var len = posArray.length;
-    for(var i=0;i<len;i++){
-        var e = new EnemyClass();
-        e.x = posArray[i].x;
-        e.y = posArray[i].y;
-        Camera360.setCurrentNormalPosition(e);
-        e.myBulletClass = BulletClass;
-        e.myMotionFunc = motionFunc;
-        e.myBulletFunc = bulletFunc;
-        e.myMotionArg = motionArg;
-        e.myBulletArg = bulletArg;
-        console.log(e.myBulletArg);
-        e.addEventListener('enterframe', function(){
-                //recommend empty.
-        });
-        scene.mainWindow.addChild(e);
-    }
-};
-
-
-//-------------------------------------------
-//エネミーのモーション関数
-//-------------------------------------------
-
