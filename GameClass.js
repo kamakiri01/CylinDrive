@@ -15,51 +15,66 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             upVectorY: -1,
             upVectorZ: 0
         };
+        core.conf = {}; //TODO仮置きオブジェクト
+        core.conf.ui = 0;
         var camera = new Camera360(cameraConf);
         //メインとUIのグループを定義
         var mainWindow = new enchant.Group();
         var uiWindow = new enchant.Group();
-
         this.mainWindow = mainWindow;
         this.uiWindow = uiWindow;
-
         mainWindow.x = UI_WIDTH;
-
         this.addChild(mainWindow);
         this.addChild(uiWindow);
 
-        var mainBg = new MainBg();
+        var mainBg = new Astro360.UI.MainBg();
         mainWindow.addChild(mainBg);
 
-        var uiBg = new UiBg();
+        var uiBg = new Astro360.UI.UiBg();
         uiWindow.addChild(uiBg);
-
-        //タッチ操作用変数
+        //シリンダー回転タッチ操作用変数
         uiWindow.currentTouchY = 0;
 //------------------------------------------------------
-        //プレイヤーを出す
         var p = new Astro360.Player.PlayerBase();
         p.x = 150;
         p.y = CORE_HEIGHT /2;
         p.targX = 150;
         p.targY = CORE_HEIGHT /2;
         mainWindow.addChild(p);
-        //常時マウス位置を取得
+//------------------------------------------------------
+// プレイヤータッチイベント定義
+//------------------------------------------------------
+        p.addEventListener('touchstart', function(e){
+                p.receiveOwnTouchStart[core.conf.ui](e);
+        });
+        p.addEventListener('touchmove', function(e){
+                p.receiveOwnTouchMove[core.conf.ui](e);
+        });
+        p.addEventListener('touchend', function(e){
+                p.receiveOwnTouchEnd[core.conf.ui](e);
+        });
+        //常時マウス位置を取得(PCでのみ有効)
         window.document.onmousemove = function(e){
             var e2x = (e.x +0) / enchant.Core.instance.scale;
             var e2y  =e.y / enchant.Core.instance.scale; 
             var obj = {x: e2x, y: e2y};
-            p.receiveTouchMove(obj);
-        }
-        mainBg.addEventListener('enterframe', function(e){
-        });
+            p.receiveFieldTouchMove[core.conf.ui](obj);
+        };
+//------------------------------------------------------
+// MainWindowフィールドタッチイベント定義
+//------------------------------------------------------
         //メイン画面のタッチイベントを自機に送る
         mainWindow.addEventListener('touchstart', function(e){
-                p.receiveTouchStart(e);
+                p.receiveFieldTouchStart[core.conf.ui](e);
         });
         mainWindow.addEventListener('touchmove', function(e){
-                p.receiveTouchMove(e);
+                p.receiveFieldTouchMove[core.conf.ui](e);
         });
+        mainWindow.addEventListener('touchend', function(e){
+                p.receiveFieldTouchEnd[core.conf.ui](e);
+        });
+//------------------------------------------------------
+// UiWindowタッチイベント定義
 //------------------------------------------------------
         //UIタッチ操作で回転させる
         uiWindow.addEventListener('touchstart', function(e){
