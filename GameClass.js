@@ -32,8 +32,13 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
 
         var uiBg = new Astro360.UI.UiBg();
         uiWindow.addChild(uiBg);
+
+        var gage = new Astro360.UI.LazerGauge();
+        mainWindow.addChild(gage);
+
         //シリンダー回転タッチ操作用変数
         uiWindow.currentTouchY = 0;
+
 //------------------------------------------------------
         var p = new Astro360.Player.PlayerBase();
         p.x = 150;
@@ -58,7 +63,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             var e2x = (e.x +0) / enchant.Core.instance.scale;
             var e2y  =e.y / enchant.Core.instance.scale; 
             var obj = {x: e2x, y: e2y};
-            p.receiveFieldTouchMove[core.conf.ui](obj);
+//            p.receiveFieldTouchMove[core.conf.ui](obj);
         };
 //------------------------------------------------------
 // MainWindowフィールドタッチイベント定義
@@ -120,7 +125,7 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                         {}, //エネミーモーションのモーションアーギュメント(使わないと思う)
                         Astro360.EnemyBullet.TestBullet, //まっすぐ飛ぶバレットクラス
                         Astro360.EnemyBulletMotion.StraightShot,
-                        {freq: 15, num:1, spd:15}
+                        {freq: 15, num:1, spd:SPEED_BULLET0}
                     );
                 }
         });
@@ -165,3 +170,28 @@ var initKeyEvents = function(){
     };
 };
 
+//------------------------------------------------------
+//ホイールイベント入力の受付
+//thanks for https://w3g.jp/blog/tools/wheelevent_crossbrowser
+var mousewheelevent = 'onwheel' in document ? 'wheel' : 'onmousewheel' in document ? 'mousewheel' : 'DOMMouseScroll';
+try{
+	document.addEventListener (mousewheelevent, onWheel, false);
+}catch(e){
+	//for legacy IE
+	document.attachEvent ("onmousewheel", onWheel);
+}
+function onWheel(e) {
+	if(!e) e = window.event; //for legacy IE
+	var delta = e.deltaY ? -(e.deltaY) : e.wheelDelta ? e.wheelDelta : -(e.detail);
+	if (delta < 0){
+		e.preventDefault();
+        //下にスクロールした場合の処理
+            Camera360.instance.rotX(-Math.PI/45 * 2);
+        console.log(e);
+	} else if (delta > 0){
+		e.preventDefault();
+		//上にスクロールした場合の処理
+            Camera360.instance.rotX(Math.PI/45 * 2);
+        console.log(e);
+	}
+}

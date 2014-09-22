@@ -55,15 +55,15 @@ var Camera360 = function(conf){
 };
 //カメラをX軸でrad回転する
 Camera360.prototype.rotX = function(rad){
-    Camera360.instance.rotN(1, 0, 0, rad);
+    Camera360.instance.rotN(1, 0, 0, rad * ROT_INVERT);
 };
 //カメラをY軸でrad回転する
 Camera360.prototype.rotY = function(rad){
-    Camera360.instance.rotN(0, 1, 0, rad);
+    Camera360.instance.rotN(0, 1, 0, rad * ROT_INVERT);
 };
 //カメラをZ軸でrad回転する
 Camera360.prototype.rotZ = function(rad){
-    Camera360.instance.rotN(0, 0, 1, rad);
+    Camera360.instance.rotN(0, 0, 1, rad * ROT_INVERT);
 };
 
 //カメラを任意軸で任意角度回転する
