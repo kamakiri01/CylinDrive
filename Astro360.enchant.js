@@ -8,12 +8,12 @@
 var Astro360 = {}; //本体オブジェクト
 Astro360.Player = {}; //プレイヤークラス
 Astro360.PlayerBullet = {}; //プレイヤーバレットクラス
-Astro360.Enemy = {}; //エネミークラス
 Astro360.Effect = {}; //エフェクト系クラス
 Astro360.UI = {}; //UI系クラス
+Astro360.Enemy = {}; //エネミークラス
 Astro360.EnemyBullet = {}; //エネミーバレットクラス
-Astro360.EnemyMotion = {}; //エネミーモーション
-Astro360.EnemyBulletMotion = {}; //エネミーバレットモーション
+Astro360.EnemyMotion = {}; //エネミーEntityモーション
+Astro360.EnemyBulletMotion = {}; //バレット生成とバレットのモーション定義
 Astro360.Methods = {}; //各種メソッド
 Astro360.Methods.Player = {}; //プレイヤー関係メソッド
 Astro360.Methods.Enemy = {}; //エネミー関係メソッド
@@ -30,6 +30,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
             this.targY = this.y;
             this.stockLazer = 1;
             this.isShouldNormalShot = false; //レーザー、とショットの切り替え、タッチ操作状態変数
+            this.isDuringLazer = false;
             this.setTouchEventArray();
             this.addEventListener('enterframe', function(){
                     this.loop();
@@ -41,7 +42,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
             this.moveApplyX(hereToTouchX/2);
             this.moveApplyY(hereToTouchY/2);
             //ノーマルショット関係
-            if(this.isShouldNormalShot === true){
+            if(this.isShouldNormalShot === true && this.isDuringLazer === false){
                 this.shotN(2);
             }
         },
@@ -76,12 +77,17 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
                 Astro360.Player.PlayerBase.instance.receiveToMove(e);
                 //残弾があればレーザー発射
                 if(Astro360.Player.PlayerBase.instance.stockLazer >= 1){
-                    Astro360.Player.PlayerBase.instance.stockLazer -= 1; //残弾消費
-                    Astro360.Player.PlayerBase.instance.shotLazer();
-                    Astro360.Player.PlayerBase.instance.isShouldNormalShot = false; //ショット停止
+
+                    //レーザー中か判定
+                    if(Astro360.Player.PlayerBase.instance.isDuringLazer === false){
+
+                        Astro360.Player.PlayerBase.instance.isDuringLazer = true; //レーザー発射判定
+                        Astro360.Player.PlayerBase.instance.stockLazer -= 1; //残弾消費
+                        Astro360.Player.PlayerBase.instance.shotLazer();
+                    }
                 }else{
-                    Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
                 }
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
             };
             this.receiveOwnTouchMove[0] = function(e){
                 console.log("ownMove1");
@@ -89,14 +95,15 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
             };
             this.receiveOwnTouchEnd[0] = function(e){
                 console.log("ownEnd1");
-                //TODO:ショットの停止
+                //ショットの停止
                 Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
             this.receiveFieldTouchStart[0] = function(e){
                 console.log("fieldStart1");
                 //this.shotN(3);
                 Astro360.Player.PlayerBase.instance.receiveToMove(e);
-                //TODO: ショット開始
+                //ショット開始
+                //Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
             };
             this.receiveFieldTouchMove[0] = function(e){
                 console.log("fieldMove1");
@@ -106,7 +113,8 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
             };
             this.receiveFieldTouchEnd[0] = function(e){
                 console.log("fieldEnd1");
-                //TODO: ショット停止
+                //ショット停止
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
 //-------------------------------------------------------
 // タッチとイベント処理パターン2
@@ -186,7 +194,7 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
         },
         //バレットのモーション
         loop: function(){
-            this.x += 40;
+            this.x += 50; //速度
             this.checkIntersect();
             if(this.y > CORE_WIDTH){
                 this.remove();
@@ -194,7 +202,7 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
         },
         //敵とのあたり判定取得
         checkIntersect: function(){
-            this.checkIntersect_(Astro360.Enemy.EnemyBase360);
+            this.checkIntersect_(Astro360.Enemy.EnemyBase360Derivative);
         },
         //敵とのあたり判定実処理
         checkIntersect_: function(enemyClassName){
@@ -235,17 +243,18 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
         //レーザーのモーション
         loop: function(){
             this.age += 1;
+            this.opacity = this.scaleY * 0.8; 
             this.checkIntersectLazer();
             if(this.age > 40){
                 this.removeLazer();
                 this.remove();
             }
             this.x = Astro360.Player.PlayerBase.instance.x;
-            this.y = Astro360.Player.PlayerBase.instance.y;
+            this.y = Astro360.Player.PlayerBase.instance.y + 16;
             this.scaleY = Math.sin(this.age/40 * Math.PI);
         },
         removeLazer: function(){
-            Astro360.Player.PlayerBase.instance.isShouldNormalShot = true; //ショット再開
+            Astro360.Player.PlayerBase.instance.isDuringLazer = false; //レーザー発射判定
         },
         checkIntersectLazer: function(){
             this.checkIntersectLazer_(Astro360.Enemy.EnemyBase360);
@@ -260,6 +269,7 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             }
             var bl = breakList.length;
             for(var j = bl - 1;j>=0;j--){
+                Astro360.Methods.Enemy.gemParticle(breakList[j]);
                 breakList[j].remove();
             }
         }
@@ -280,9 +290,6 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
             this.myBulletFunc = function(){};
             this.myBulletArg = {};
             this.addEventListener('enterframe', function(){
-                    //age++
-                    this.myMotionFunc(this, this.myMotionArg);
-                    this.myBulletFunc(this, this.myBulletArg);
                     //2Dマッピングで画面外に出たら消える
                     if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
                         this.remove();
@@ -302,7 +309,7 @@ Astro360.Enemy.EnemyBase360Derivative = enchant.Class.create(Astro360.Enemy.Enem
             Astro360.Enemy.EnemyBase360.call(this, wx, wy);
     }
 });
-//適当な三角形のエネミー（テスト用？）
+//適当な三角形のエネミー
 Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
@@ -317,42 +324,50 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
             this.sCtx.closePath();
             this.sCtx.stroke();
             this.frame = 7;
-        },
-        setMyMotion: function(){
-            this.addEventListener('enterframe', function(){
-                    this.rotation -= 1;
-                    this.px -=SPEED_ENEMY0;
-            });
         }
 });
 //加速度系実装テストを行う敵クラス
-//任意の初期速度、加速度を持つ
-Astro360.Enemy.SimpleEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
-        initialize: function(posObj, velObj, accObj){
-            EnemyBase360Derivative.call(this, 32, 32);
-            this.image = enchant.Core.instance.assets[IMAGE_PLAYER_BASE];
+Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
+        initialize: function(argObj){
+            Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
+
+            //表示は三角
+            var sf = new Surface(20, 20);
+            this.image = sf;
+            this.sCtx = sf.context;
+            this.sCtx.beginPath();              
+            this.sCtx.strokeStyle='#3333ff';     
+            this.sCtx.moveTo(12, 1);
+            this.sCtx.lineTo(20, 15);
+            this.sCtx.lineTo(4, 15);
+            this.sCtx.closePath();
+            this.sCtx.stroke();
             this.frame = 7;
-            this.scaleX = -1;
-            this.px = posObj.x;
-            this.py = posObj.y;
-            this.pz = posObj.z;
+
+            //var posObj = argObj.pos;
+            var velObj = argObj.vel;
+            var accObj = argObj.acc;
+            //px系はsetCurrentNormalPositionでのみ設定される
+            this.px = 0; //posObj.x;
+            this.py = 0; //posObj.y;
+            this.pz = 0; //posObj.z;
             this.velX = velObj.x;
             this.velY = velObj.y;
             this.velZ = velObj.z;
             this.accX = accObj.x;
             this.accY = accObj.y;
             this.accZ = accObj.z;
-        },
-        setMyMotion: function(){
-            this.addEventListener('enterframe', function(){
-                    this.velX += this.accX;
-                    this.velY += this.accY;
-                    this.velZ += this.accZ;
-                    this.px += this.velX;
-                    this.py += this.velY;
-                    this.pz += this.velZ;
-            });
         }
+//        setMyMotion: function(){
+//            this.addEventListener('enterframe', function(){
+//                    this.velX += this.accX;
+//                    this.velY += this.accY;
+//                    this.velZ += this.accZ;
+//                    this.px += this.velX;
+//                    this.py += this.velY;
+//                    this.pz += this.velZ;
+//            });
+//        }
 });
 //-------------------------------------------------------
 // Astro360.Effect
@@ -391,7 +406,7 @@ Astro360.EnemyBullet.BulletBase = enchant.Class.create(Astro360.Enemy.EnemyBase3
     }
 });
 //敵のシングルショット
-Astro360.EnemyBullet.TestBulletBase = enchant.Class.create(Astro360.EnemyBullet.BulletBase, {
+Astro360.EnemyBullet.TestBullet = enchant.Class.create(Astro360.EnemyBullet.BulletBase, {
         initialize: function(){
             Astro360.EnemyBullet.BulletBase.call(this, 16, 16);
             this.image = Dot.surface;
@@ -419,16 +434,47 @@ Astro360.EnemyBullet.FanBullet = enchant.Class.create(Astro360.EnemyBullet.Bulle
     }
 });
 //-------------------------------------------------------
-//Astro360.EnemyMotion
+//Astro360.EnemyMotion //敵スプライトの移動モーション管理3D
 //-------------------------------------------------------
 //ただまっすぐ進むモーション
-Astro360.EnemyMotion.Simple = function(enem, argObj){
-    enem.px -= SPEED_ENEMY0;
-    enem.rotation -= 1;
+Astro360.EnemyMotion.Simple = function(enem){
+    enem.addEventListener('enterframe', function(){
+            enem.px -= SPEED_ENEMY0;
+            enem.rotation -= 1;
+    });
+};
+//加速度系を持たせる基本モーション
+Astro360.EnemyMotion.Acceleration = function(enem){
+    enem.addEventListener('enterframe', function(){
+            enem.velX += enem.accX;
+            enem.velY += enem.accY;
+            enem.velZ += enem.accZ;
+            enem.px += enem.velX;
+            enem.py += enem.velY;
+            enem.pz += enem.velZ;
+    });
 };
 //-------------------------------------------------------
-//Astro360.EnemyBulletMotion
+//Astro360.EnemyBulletMotion //敵のショットモーション（タイミング含む）
 //-------------------------------------------------------
+//直進弾を撃つモーション
+Astro360.EnemyBulletMotion.StraightShot= function(enem, argObj){
+    var freq = argObj.freq;
+    var num = argObj.num;
+    var spd = argObj.spd;
+    if(enem.age % freq === 0){
+        var b = new Astro360.EnemyBullet.TestBullet();
+        b.px = enem.px;
+        b.py = enem.py;
+        b.pz = enem.pz;
+        b.setMyMotion();
+        b.loop();//座標が00になってしまうのを防ぐ
+        if(enem.parentNode !== null){
+            enem.parentNode.addChild(b);
+        }
+    }
+};
+//扇状に撃つモーション
 Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
     var freq = argObj.freq;
     if(enem.age % freq === 0){
@@ -467,6 +513,7 @@ Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
 // astro360.Methods.Enemy
 //-------------------------------------------------------
 //敵がふつうのショットを撃つ
+//使わない
 Astro360.Methods.Enemy.createNormalBullet = function(master, spd){
     var b = new Astro360.EnemyBullet.TestBulletBase();
     b.px = master.px;
@@ -478,6 +525,7 @@ Astro360.Methods.Enemy.createNormalBullet = function(master, spd){
         master.parentNode.addChild(b);
     }
 };
+//gemenemyとFanBulletで同じ処理を生成するので今後不要。動作参考だけ。使わない事
 //放射状の弾を撃つ
 //発射点、発射数、散乱角度、射出速度
 Astro360.Methods.Enemy.createRippleBullet = function(master, num, rad, spd){
@@ -516,22 +564,21 @@ Astro360.Methods.Enemy.gemParticle = function(e){
 //生成エネミークラス、生成初期位置、運動関数、運動引数、
 //バレットクラス、バレット関数、バレット引数
 //
-Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
     var len = posArray.length;
     for(var i=0;i<len;i++){
-        var e = new EnemyClass();
+        var e = new EnemyClass(enemyArg);
         e.x = posArray[i].x;
         e.y = posArray[i].y;
         Camera360.setCurrentNormalPosition(e);
-        e.myBulletClass = BulletClass;
-        e.myMotionFunc = motionFunc;
-        e.myBulletFunc = bulletFunc;
-        e.myMotionArg = motionArg;
-        e.myBulletArg = bulletArg;
+        e.myBulletClass = BulletClass; //バレットEntityクラス
+        e.myBulletFunc = bulletFunc; //バレット生成とバレットのモーション(毎フレーム呼ばれる)
+        e.myBulletArg = bulletArg; //バレット生成モーションの引数 bulletfunc(bulletarg)
+        motionFunc(e, motionArg); //ここで引数を取る
         e.addEventListener('enterframe', function(){
-                //recommend empty.
+                e.myBulletFunc(e, e.myBulletArg);
         });
         scene.mainWindow.addChild(e);
     }
