@@ -228,10 +228,21 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             var sf = new enchant.Surface(CORE_WIDTH, 32);
             var ctx = sf.context;
             ctx.beginPath();
+
+            var grad  = ctx.createLinearGradient(0,0, 0, 32);
+            grad.addColorStop(0,'rgb(128, 100, 162)');  // 紫
+            grad.addColorStop(0.5,'rgb(255, 255, 255)'); // 緑
+            grad.addColorStop(1,'rgb(128, 100, 162)');  // 紫
+            /* グラデーションをfillStyleプロパティにセット */
+            ctx.fillStyle = grad;
+            ctx.rect(0,0, CORE_WIDTH,32);
+            ctx.fill();
+
+
 //            ctx.scale(1.8, 0.6);
-            ctx.fillStyle = 'rgb(25, 0, 255)';
-            ctx.fillRect(0, 0, CORE_WIDTH, 32);  //ここに端は円を描画 TODO
-            this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3;
+//            ctx.fillStyle = 'rgb(25, 0, 255)';
+//            ctx.fillRect(0, 0, CORE_WIDTH, 32);  //ここに端は円を描画 TODO
+//            this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3;
             //モーションループ
             this.addEventListener('enterframe', function(){
                     this.loop();
