@@ -322,7 +322,7 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
             this.frame = 7;
         }
 });
-//加速度系実装テストを行う敵クラス
+//加速度系処理を行う敵クラス(new時点のcore.thetaを参照)
 Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(argObj){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
@@ -344,6 +344,40 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
 //            var accObj = argObj.acc;
             var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
             var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
+            //px系はsetCurrentNormalPositionでのみ設定される
+            this.px = 0; //posObj.x;
+            this.py = 0; //posObj.y;
+            this.pz = 0; //posObj.z;
+            this.velX = velObj.x;
+            this.velY = velObj.y;
+            this.velZ = velObj.z;
+            this.accX = accObj.x;
+            this.accY = accObj.y;
+            this.accZ = accObj.z;
+        }
+});
+//加速度系処理を行う敵クラス(new時点のcore.thetaを参照しない、argobjのみを利用する)
+//コンストラクタに引き渡すvel, accにはsetReferenceFromViewPositionを通すこと）
+Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
+    initialize: function(argObj){
+            Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
+            //表示は三角
+            var sf = new Surface(20, 20);
+            this.image = sf;
+            this.sCtx = sf.context;
+            this.sCtx.beginPath();              
+            this.sCtx.strokeStyle='#3333ff';     
+            this.sCtx.moveTo(12, 1);
+            this.sCtx.lineTo(20, 15);
+            this.sCtx.lineTo(4, 15);
+            this.sCtx.closePath();
+            this.sCtx.stroke();
+            this.frame = 7;
+
+            var velObj = argObj.vel;
+            var accObj = argObj.acc;
+//            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
+//            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
             console.log(accObj);
             console.log(velObj);
             //px系はsetCurrentNormalPositionでのみ設定される
@@ -356,7 +390,7 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.accX = accObj.x;
             this.accY = accObj.y;
             this.accZ = accObj.z;
-        }
+    }
 });
 //-------------------------------------------------------
 // Astro360.Effect
@@ -511,7 +545,7 @@ Astro360.Methods.Enemy.gemParticle = function(e){
 //任意の敵を1つ生成する
 //生成エネミークラス、生成初期位置、運動関数、運動引数、
 //バレットクラス、バレット関数、バレット引数
-//
+//出現座標は固定、加速度・速度に対してgemEnemy内では処理を変えない
 Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
@@ -530,6 +564,37 @@ Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motio
         });
         scene.mainWindow.addChild(e);
     }
+};
+
+//出現時点の回転状態などを固定して複数のエネミーを生成する。一定間隔で同じposobj座標に生成する
+Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+    var core = enchant.Core.instance;
+    var scene = PlayScene.instance;
+    //生成処理
+    var posArray = [posObj];
+    Astro360.Methods.Enemy.gemEnemy(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg);
+    if(num > 0){
+        //再帰呼び出し
+        var str = "Astro360.Methods.Enemy.gemLinearEnemyUnit(" + 
+                  EnemyClass + 
+                  "," + enemyArg + 
+                  "," + posObj + 
+                  "," + num + "-1" + 
+                  "," + delay + 
+                  "," + motionFunc + 
+                  "," + motionArg + 
+                  "," + BulletClass + 
+                  "," + bulletFunc + 
+                  "," + bulletArg + 
+                  ")";
+        //setTimeout(str, delay);
+        setTimeout(function(){
+                Astro360.Methods.Enemy.gemLinearEnemyUnit(EnemyClass, enemyArg, posObj, num - 1, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg);
+        },delay);
+
+        //setTimeout("Astro360.Methods.Enemy.gemLinearEnemyUnit(" + EnemyClass + "," + enemyArg + "," + posObj + "," + num "-1, " + delay + "," + motionFunc + "," motionArg + "," BulletClass + "," + bulletFunc + "," bulletArg + ")", delay);
+    }
+
 };
 //--------------------
 //インターフェース回りのクラス定義
