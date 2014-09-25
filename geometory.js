@@ -1,5 +1,4 @@
 var Geo = {};
-
 /*
  * 円描画クラス
  *
@@ -29,6 +28,37 @@ Geo.Circle = enchant.Class.create(enchant.Sprite, {
     }
 });
 
+Geo.Circle2 = enchant.Class.create(enchant.Sprite, {
+        initialize: function(rad, color){
+        enchant.Sprite.call(this, rad*2, rad*2);
+        var sf = new Surface(rad*2, rad*2);
+        this.image = sf;
+        this.sCtx = sf.context;
+        if(color === undefined){
+            color = 'rgba(192, 192, 192, 1)';
+        }
+        this.drawColor = color;
+        this.reflesh(rad);
+    },
+    reflesh: function(rad){
+        this.sCtx.beginPath();
+        this.sCtx.clearRect(0,0,rad*2, rad*2);
+        this.sCtx.strokeStyle = this.drawColor;
+        this.sCtx.beginPath();
+        this.sCtx.arc(rad, rad, rad, 0, Math.PI*2, true);
+        this.sCtx.arc(rad, rad, rad-1, 0, Math.PI*2, false);
+        this.sCtx.fill();
+        this.sCtx.closePath();
+        this.sCtx.stroke();
+            this.sCtx.beginPath();              
+            this.sCtx.strokeStyle='#3333ff';     
+            this.sCtx.moveTo(12/32 * rad, 1/32 * rad);
+            this.sCtx.lineTo(20/32 * rad, 15/32 * rad);
+            this.sCtx.lineTo(4/32 * rad, 15/32 * rad);
+            this.sCtx.closePath();
+            this.sCtx.fill();
+    }
+});
 Geo.LineLayer = enchant.Class.create(enchant.Sprite, {
     initialize: function(){
         enchant.Sprite.call(this, 

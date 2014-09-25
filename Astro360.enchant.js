@@ -22,9 +22,9 @@ Astro360.Methods.Enemy = {}; //エネミー関係メソッド
 // Astro360.Player
 //-------------------------------------------------------
 //PlayerBaseの画像サイズは引数でSpriteと同様に指定する
-Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle, {
+Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
         initialize: function(){
-            Geo.Circle.call(this, 32);
+            Geo.Circle2.call(this, 32);
             Astro360.Player.PlayerBase.instance = this;
             this.targX = this.x;
             this.targY = this.y;
@@ -237,12 +237,6 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             ctx.fillStyle = grad;
             ctx.rect(0,0, CORE_WIDTH,32);
             ctx.fill();
-
-
-//            ctx.scale(1.8, 0.6);
-//            ctx.fillStyle = 'rgb(25, 0, 255)';
-//            ctx.fillRect(0, 0, CORE_WIDTH, 32);  //ここに端は円を描画 TODO
-//            this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3;
             //モーションループ
             this.addEventListener('enterframe', function(){
                     this.loop();
