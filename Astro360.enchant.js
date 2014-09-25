@@ -45,7 +45,6 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             if(this.isShouldNormalShot === true && this.isDuringLazer === false){
                 this.shotN(2);
             }
-
             if(this.stockLazer < MAX_LAZER_STOCK){
                 this.stockLazer += 0.01;
             }
@@ -300,7 +299,7 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
             });
         }
 });
-//バレットを含まない敵の親クラス
+//エネミーバレットを含まない敵の親クラス
 Astro360.Enemy.EnemyBase360Derivative = enchant.Class.create(Astro360.Enemy.EnemyBase360, {
         initialize: function(wx, wy){
             Astro360.Enemy.EnemyBase360.call(this, wx, wy);
@@ -327,7 +326,6 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
 Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(argObj){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
-
             //表示は三角
             var sf = new Surface(20, 20);
             this.image = sf;
@@ -341,8 +339,13 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.sCtx.stroke();
             this.frame = 7;
 
-            var velObj = argObj.vel;
-            var accObj = argObj.acc;
+            var core = enchant.Core.instance;
+//            var velObj = argObj.vel;
+//            var accObj = argObj.acc;
+            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
+            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
+            console.log(accObj);
+            console.log(velObj);
             //px系はsetCurrentNormalPositionでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;

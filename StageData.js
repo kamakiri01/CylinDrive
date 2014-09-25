@@ -20,7 +20,6 @@ stageEventData[0] = function(scene){
                     {freq: 20, num: 5, rad: 20, spd: 15} //弾の密度と頻度と投射角度
                 );
             }
-
             //Uターンして帰っていく敵の生成テスト
             if(scene.age % 30 ===10){
                 Astro360.Methods.Enemy.gemEnemy(
@@ -40,4 +39,4 @@ stageEventData[0] = function(scene){
                 );
             }
     });
-}
+};
