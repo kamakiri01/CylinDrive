@@ -17,13 +17,14 @@ stageEventData[0] = function(scene){
                     {}, //前進に引数なし
                     Astro360.EnemyBullet.FanBullet, //扇状の弾のためのバレットクラス
                     Astro360.EnemyBulletMotion.RippleShot, //扇状に弾を撃つバレットモーション
-                    {freq: 20, num: 5, rad: 20, spd: 15} //弾の密度と頻度と投射角度
+                    {freq: 20, num: 5, rad: 20, spd: 15}, //弾の密度と頻度と投射角度
+                    true //座標系のリファレンス化処理を行う
                 );
             }
             //Uターンして帰っていく敵の生成テスト
             if(scene.age === 100){
                 Astro360.Methods.Enemy.gemLinearEnemyUnit(
-                    Astro360.Enemy.AccEnemy360,  //一般的なエネミークラス
+                    Astro360.Enemy.AccEnemy360FixedReference,  //一般的なエネミークラス
                     {
                         vel:{x:-30,y:10,z:0
                         }, 
@@ -37,7 +38,8 @@ stageEventData[0] = function(scene){
                     {}, //エネミーモーションのモーションアーギュメント(使わないと思う)
                     Astro360.EnemyBullet.TestBullet, //まっすぐ飛ぶバレットクラス
                     Astro360.EnemyBulletMotion.StraightShot,
-                    {freq: 15, num:1, spd:SPEED_BULLET0}
+                    {freq: 15, num:1, spd:SPEED_BULLET0},
+                    true
                 );
             }
             if(scene.age % 30 ===100000){
@@ -54,7 +56,8 @@ stageEventData[0] = function(scene){
                     {}, //エネミーモーションのモーションアーギュメント(使わないと思う)
                     Astro360.EnemyBullet.TestBullet, //まっすぐ飛ぶバレットクラス
                     Astro360.EnemyBulletMotion.StraightShot,
-                    {freq: 15, num:1, spd:SPEED_BULLET0}
+                    {freq: 15, num:1, spd:SPEED_BULLET0},
+                    true
                 );
             }
     });

@@ -342,8 +342,8 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             var core = enchant.Core.instance;
 //            var velObj = argObj.vel;
 //            var accObj = argObj.acc;
-            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
-            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
+            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y + core.height/2);
+            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y + core.height/2);
             //px系はsetCurrentNormalPositionでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;
@@ -378,8 +378,6 @@ Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.E
             var accObj = argObj.acc;
 //            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
 //            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
-            console.log(accObj);
-            console.log(velObj);
             //px系はsetCurrentNormalPositionでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;
@@ -546,15 +544,25 @@ Astro360.Methods.Enemy.gemParticle = function(e){
 //生成エネミークラス、生成初期位置、運動関数、運動引数、
 //バレットクラス、バレット関数、バレット引数
 //出現座標は固定、加速度・速度に対してgemEnemy内では処理を変えない
-Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, normalizeFrag){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
     var len = posArray.length;
     for(var i=0;i<len;i++){
         var e = new EnemyClass(enemyArg);
-        e.x = posArray[i].x;
-        e.y = posArray[i].y;
-        Camera360.setCurrentNormalPosition(e);
+        //フラグ有効時は2D座標が、falseでは入力されるべきPX座標系が直接渡されている
+        if(normalizeFrag === true){
+            e.x = posArray[i].x;
+            e.y = posArray[i].y;
+            Camera360.setCurrentNormalPosition(e);
+            console.log("setCurrentNormalPosition");
+        }else{
+            e.px = posArray[i].x;
+            e.py = posArray[i].y;
+            e.pz = posArray[i].z;
+            console.log(posArray[i]);
+            console.log("setCurrentNormalPosition -NOT");
+        }
         e.myBulletClass = BulletClass; //バレットEntityクラス
         e.myBulletFunc = bulletFunc; //バレット生成とバレットのモーション(毎フレーム呼ばれる)
         e.myBulletArg = bulletArg; //バレット生成モーションの引数 bulletfunc(bulletarg)
@@ -567,32 +575,49 @@ Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motio
 };
 
 //出現時点の回転状態などを固定して複数のエネミーを生成する。一定間隔で同じposobj座標に生成する
-Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg){
+//settimeoutなのでCoreのフレーム対する遅延保証がない。遅い環境だとレイアウト崩れるかも。
+Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, referenceFrag){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
-    //生成処理
-    var posArray = [posObj];
-    Astro360.Methods.Enemy.gemEnemy(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg);
+    var handOVerPosObj = {};
+    console.log(referenceFrag);
+    console.log(posObj);
+    //初回のみ入力は2D系なので座標生成処理
+    if(referenceFrag === true){
+        handOverPosObj = Camera360.setReferenceFromViewPosition(posObj.x, posObj.y);
+        var velObj = Camera360.setReferenceFromViewPosition(enemyArg.vel.x, enemyArg.vel.y + core.height/2);
+        var accObj = Camera360.setReferenceFromViewPosition(enemyArg.acc.x, enemyArg.acc.y + core.height/2);
+        enemyArg.vel = velObj;
+        enemyArg.acc = accObj;
+    }else{
+ //       handOverPosObj = posObj;
+    }
+    var posArray = [handOverPosObj]; //3D座標
+    Astro360.Methods.Enemy.gemEnemy(
+        EnemyClass, 
+        enemyArg, 
+        posArray, 
+        motionFunc, 
+        motionArg, 
+        BulletClass, 
+        bulletFunc, 
+        bulletArg, false);
     if(num > 0){
         //再帰呼び出し
-        var str = "Astro360.Methods.Enemy.gemLinearEnemyUnit(" + 
-                  EnemyClass + 
-                  "," + enemyArg + 
-                  "," + posObj + 
-                  "," + num + "-1" + 
-                  "," + delay + 
-                  "," + motionFunc + 
-                  "," + motionArg + 
-                  "," + BulletClass + 
-                  "," + bulletFunc + 
-                  "," + bulletArg + 
-                  ")";
-        //setTimeout(str, delay);
         setTimeout(function(){
-                Astro360.Methods.Enemy.gemLinearEnemyUnit(EnemyClass, enemyArg, posObj, num - 1, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg);
-        },delay);
-
-        //setTimeout("Astro360.Methods.Enemy.gemLinearEnemyUnit(" + EnemyClass + "," + enemyArg + "," + posObj + "," + num "-1, " + delay + "," + motionFunc + "," motionArg + "," BulletClass + "," + bulletFunc + "," bulletArg + ")", delay);
+                Astro360.Methods.Enemy.gemLinearEnemyUnit(
+                    EnemyClass, 
+                    enemyArg, 
+                    handOverPosObj, 
+                    num - 1, 
+                    delay, 
+                    motionFunc, 
+                    motionArg, 
+                    BulletClass, 
+                    bulletFunc, 
+                    bulletArg, false); //2回目以降は3D座標が入力される
+        }, 
+        delay);
     }
 
 };
