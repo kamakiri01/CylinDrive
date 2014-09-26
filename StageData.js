@@ -23,7 +23,7 @@ stageEventData[0] = function(scene){
             }
             //Uターンして帰っていく敵の生成テスト
             if(scene.age === 100){
-                Astro360.Methods.Enemy.gemLinearEnemyUnit(
+                Astro360.Methods.Enemy.gemLinearAccEnemyUnit(
                     Astro360.Enemy.AccEnemy360FixedReference,  //一般的なエネミークラス
                     {
                         vel:{x:-30,y:10,z:0

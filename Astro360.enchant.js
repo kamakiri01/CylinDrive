@@ -340,11 +340,9 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.frame = 7;
 
             var core = enchant.Core.instance;
-//            var velObj = argObj.vel;
-//            var accObj = argObj.acc;
             var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y + core.height/2);
             var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y + core.height/2);
-            //px系はsetCurrentNormalPositionでのみ設定される
+            //px系はgemEnemyでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;
             this.pz = 0; //posObj.z;
@@ -376,9 +374,7 @@ Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.E
 
             var velObj = argObj.vel;
             var accObj = argObj.acc;
-//            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y+ core.height/2);
-//            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y+ core.height/2);
-            //px系はsetCurrentNormalPositionでのみ設定される
+            //px系はgemEnemyでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;
             this.pz = 0; //posObj.z;
@@ -555,13 +551,10 @@ Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motio
             e.x = posArray[i].x;
             e.y = posArray[i].y;
             Camera360.setCurrentNormalPosition(e);
-            console.log("setCurrentNormalPosition");
         }else{
             e.px = posArray[i].x;
             e.py = posArray[i].y;
             e.pz = posArray[i].z;
-            console.log(posArray[i]);
-            console.log("setCurrentNormalPosition -NOT");
         }
         e.myBulletClass = BulletClass; //バレットEntityクラス
         e.myBulletFunc = bulletFunc; //バレット生成とバレットのモーション(毎フレーム呼ばれる)
@@ -576,12 +569,11 @@ Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motio
 
 //出現時点の回転状態などを固定して複数のエネミーを生成する。一定間隔で同じposobj座標に生成する
 //settimeoutなのでCoreのフレーム対する遅延保証がない。遅い環境だとレイアウト崩れるかも。
-Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, referenceFrag){
+//実質的にAccEnemy360FixedReference専用の隊列生成メソッド
+Astro360.Methods.Enemy.gemLinearAccEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, referenceFrag){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
-    var handOVerPosObj = {};
-    console.log(referenceFrag);
-    console.log(posObj);
+    var handOverPosObj = {};
     //初回のみ入力は2D系なので座標生成処理
     if(referenceFrag === true){
         handOverPosObj = Camera360.setReferenceFromViewPosition(posObj.x, posObj.y);
@@ -590,7 +582,7 @@ Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posOb
         enemyArg.vel = velObj;
         enemyArg.acc = accObj;
     }else{
- //       handOverPosObj = posObj;
+        handOverPosObj = posObj;
     }
     var posArray = [handOverPosObj]; //3D座標
     Astro360.Methods.Enemy.gemEnemy(
@@ -605,7 +597,7 @@ Astro360.Methods.Enemy.gemLinearEnemyUnit = function(EnemyClass, enemyArg, posOb
     if(num > 0){
         //再帰呼び出し
         setTimeout(function(){
-                Astro360.Methods.Enemy.gemLinearEnemyUnit(
+                Astro360.Methods.Enemy.gemLinearAccEnemyUnit(
                     EnemyClass, 
                     enemyArg, 
                     handOverPosObj, 
