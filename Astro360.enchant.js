@@ -633,10 +633,19 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
             var sf = new Surface(UI_WIDTH, CORE_HEIGHT);
             var ctx = sf.context;
             ctx.beginPath();
+            //外枠を黒\塗り
             ctx.fillStyle = 'rgba(1, 1, 1, 1)';
             ctx.fillRect(0, 0, UI_WIDTH, CORE_HEIGHT);
-            ctx.fillStyle = 'rgba(1, 100, 100, 100)';
-            ctx. fillRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
+//            ctx.fillStyle = 'rgba(1, 100, 100, 100)';
+//            ctx. fillRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
+            //グラデーション
+            var grad  = ctx.createLinearGradient(0,0, 0, CORE_HEIGHT*2);
+            grad.addColorStop(0,'rgba(1, 128, 100, 162)');  // 紫
+            grad.addColorStop(1,'rgb(255, 255, 255)'); // 緑
+            /* グラデーションをfillStyleプロパティにセット */
+            ctx.fillStyle = grad;
+            ctx.rect(3,3, UI_WIDTH-6, CORE_HEIGHT-6);
+            ctx.fill();
             bg.image = sf;
             this.addChild(bg);
         }
