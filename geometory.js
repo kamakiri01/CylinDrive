@@ -45,7 +45,7 @@ Geo.Circle2 = enchant.Class.create(enchant.Sprite, {
         });
     },
     reflesh: function(rad){
-        this.rotation -= 10;
+        this.rotation = 30;
         this.sCtx.beginPath();
         this.sCtx.clearRect(0,0,rad*2, rad*2);
         this.sCtx.strokeStyle = this.drawColor;
@@ -57,9 +57,12 @@ Geo.Circle2 = enchant.Class.create(enchant.Sprite, {
         this.sCtx.fill();
             this.sCtx.beginPath();              
             this.sCtx.strokeStyle='#3333ff';     
-            this.sCtx.moveTo(12/32 * rad * 1.2, 1/32 * rad * 1.2);
-            this.sCtx.lineTo(20/32 * rad * 1.2, 15/32 * rad * 1.2);
-            this.sCtx.lineTo(4/32 * rad * 1.2, 15/32 * rad * 1.2);
+            var s = rad/2;
+            var fitX = rad/2;
+            var fitY = rad/ Math.sqrt(2);
+            this.sCtx.moveTo(s + fitX, s * Math.sqrt(3) + fitY );;
+            this.sCtx.lineTo(s * 2 + fitX, 0 + fitY);
+            this.sCtx.lineTo(0 + fitX, 0 + fitY);
             this.sCtx.closePath();
             this.sCtx.fill();
     }
