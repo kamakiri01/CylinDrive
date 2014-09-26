@@ -54,7 +54,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             var p = Astro360.Player.PlayerBase.instance;
             //出現点を自機より前に取る
             s.x = p.x + p.width;
-            s.y = p.y + p.height/2 - s.height/2;
+            s.y = p.y + p.height/2 - s.height/2 - 6;
             PlayScene.instance.mainWindow.addChild(s);
         },
         shotN: function(n){
@@ -189,7 +189,9 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
             ctx.scale(1.8, 0.6);
             ctx.arc(30,35,15,0,Math.PI*2,false);
             ctx.stroke();
-            this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3;
+            this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3; 
+            //this.frame =  Math.round(Math.random()) % 3;
+            //this.scaleY = Math.round(Math.random() + 1) / 2;
             //モーションループ
             this.addEventListener('enterframe', function(){
                     this.loop();
