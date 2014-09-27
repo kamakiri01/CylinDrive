@@ -40,6 +40,10 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         lestUnit.x = GAUGE_WIDTH * MAX_LAZER_STOCK + 10; 
         mainWindow.addChild(lestUnit);
 
+        var score = new Astro360.UI.ScoreLabel();
+        score.x = lestUnit.x + lestUnit.width + 10; 
+        mainWindow.addChild(score);
+
         //シリンダー回転タッチ操作用変数
         uiWindow.currentTouchY = 0;
 

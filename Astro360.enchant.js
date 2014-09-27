@@ -253,7 +253,7 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
                 if(this.intersect(enemyClassName.collection[i])) {
                     //破壊エフェクト関数
                     Astro360.Methods.Enemy.gemParticle(enemyClassName.collection[i]);
-                    enemyClassName.collection[i].remove();
+                    enemyClassName.collection[i].removeAction();
                     this.remove();
                     break;
                 }
@@ -317,7 +317,7 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             var bl = breakList.length;
             for(var j = bl - 1;j>=0;j--){
                 Astro360.Methods.Enemy.gemParticle(breakList[j]);
-                breakList[j].remove();
+                breakList[j].removeAction();
             }
         }
 });
@@ -341,6 +341,10 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
                         this.remove();
                     } 
             });
+        },
+        removeAction: function(){
+            enchant.Core.instance.score += 100;
+            this.remove();
         }
 });
 //エネミーバレットを含まない敵の親クラス
@@ -771,6 +775,17 @@ Astro360.UI.LestUnit = enchant.Class.create(enchant.Sprite, {
                 if(p.lestPlayer >= 0){
                     this.width = GAUGE_HEIGHT * p.lestPlayer;
                 };//elseは発生しない
+        });
+    }
+});
+
+Astro360.UI.ScoreLabel = enchant.Class.create(enchant.Label, {
+    initialize: function(){
+        enchant.Label.call(this);
+        this.font = "32px sans bold";
+        this.color = "red";
+        this.addEventListener('enterframe', function(){
+                this.text = enchant.Core.instance.score + "Pt";
         });
     }
 });
