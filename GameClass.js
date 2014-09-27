@@ -36,6 +36,10 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
         var gage = new Astro360.UI.LazerGauge();
         mainWindow.addChild(gage);
 
+        var lestUnit = new Astro360.UI.LestUnit();
+        lestUnit.x = GAUGE_WIDTH * MAX_LAZER_STOCK + 10; 
+        mainWindow.addChild(lestUnit);
+
         //シリンダー回転タッチ操作用変数
         uiWindow.currentTouchY = 0;
 

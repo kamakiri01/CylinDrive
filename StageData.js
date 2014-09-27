@@ -8,7 +8,7 @@ stageEventData[0] = function(scene){
     //テストとして扇状の弾を撃つ敵をランダムに出現させる
     scene.addEventListener('enterframe', function(){
             var scene = enchant.Core.instance.currentScene;
-            if(scene.age % 30 === 1000000){
+            if(scene.age % 30 === 15){
                 Astro360.Methods.Enemy.gemEnemy(
                     Astro360.Enemy.TestEnemyBase360,  //一般的なエネミークラス
                     {}, //newの引数
@@ -42,7 +42,7 @@ stageEventData[0] = function(scene){
                     true
                 );
             }
-            if(scene.age % 30 ===100000){
+            if(scene.age % 30 ===0){
                 Astro360.Methods.Enemy.gemEnemy(
                     Astro360.Enemy.AccEnemy360,  //一般的なエネミークラス
                     {
