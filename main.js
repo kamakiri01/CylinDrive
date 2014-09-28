@@ -6,10 +6,11 @@ window.onload = function(){
     core.keyEvent = [];
     core.preload(IMAGE_PRELOAD);
     core.onload = function(){
-        core.pushScene(new PlayScene());
+        core.pushScene(new StartScene());
     };
     core.endFunc = function(){
-        core.end(core.score, core.score + "点");
+        var score = PlayScene.instance.age / core.fps;
+        core.end(score, score + "秒でトライアルクリア");
     };
     core.start();
 };

@@ -4,7 +4,7 @@ var IMAGE_PRELOAD = [];
 
 //astro360
 var SPEED_ENEMY0 = 5;
-var SPEED_BULLET0 = 15;
+var SPEED_BULLET0 = 11;
 
 //GameClass
 var CORE_WIDTH = 640;

@@ -8,7 +8,7 @@ stageEventData[0] = function(scene){
     //テストとして扇状の弾を撃つ敵をランダムに出現させる
     scene.addEventListener('enterframe', function(){
             var scene = enchant.Core.instance.currentScene;
-            if(scene.age % 30 === 15){
+            if(scene.age > 60 && scene.age % 30 === 15){
                 Astro360.Methods.Enemy.gemEnemy(
                     Astro360.Enemy.TestEnemyBase360,  //一般的なエネミークラス
                     {}, //newの引数
@@ -22,16 +22,25 @@ stageEventData[0] = function(scene){
                 );
             }
             //Uターンして帰っていく敵の生成テスト
-            if(scene.age === 100){
+            if(scene.age > 120 && scene.age % 100 === 0){
+                var y = Math.random()*CORE_HEIGHT;
+                var phase;
+                if(y < CORE_HEIGHT/2){
+                    phase = 1;
+                }else{
+                    phase = -1;
+                }
+                var vy = Math.abs( CORE_HEIGHT - y ) / 10;
+                vy *= phase;
                 Astro360.Methods.Enemy.gemLinearAccEnemyUnit(
                     Astro360.Enemy.AccEnemy360FixedReference,  //一般的なエネミークラス
                     {
-                        vel:{x:-30,y:10,z:0
+                        vel:{x:-30,y:vy,z:0
                         }, 
                         acc:{x:1,y:0,z:0
                         }
                     }, //エネミークラスのnew引数
-                    {x:CORE_WIDTH, y: 30}, //出現初期位置.[]ではない
+                    {x:CORE_WIDTH, y: y}, //出現初期位置.[]ではない
                     5, //とりあえず3体出す
                     150, //delay
                     Astro360.EnemyMotion.Acceleration, //加速度系に属する(初回1度だけ実行)

@@ -48,13 +48,15 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             if(this.isShouldNormalShot === true && this.isDuringLazer === false){
                 this.shotN(2);
             }
+            //レーザーチャージ
             if(this.stockLazer < MAX_LAZER_STOCK){
                 this.stockLazer += 0.01;
             }
-            //無敵表示
-            if(this.lestSafeTime <= 0){
+            //あたり判定
+            if(this.lestSafeTime <= 0 && this.isDuringLazer === false){
                 this.checkIntersectWithEnemy();
             }
+            //無敵表示
             if(this.lestSafeTime > 0){
                 this.opacity = this.lestSafeTime % 2; // 明滅
                 this.lestSafeTime -= 1;
@@ -83,6 +85,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
                 this.lestSafeTime += 30;
             }else{
                 //ゲーム終了を呼び出す
+                enchant.Core.instance.endFunc();
             }
         },
         shot1: function(){
@@ -782,10 +785,14 @@ Astro360.UI.LestUnit = enchant.Class.create(enchant.Sprite, {
 Astro360.UI.ScoreLabel = enchant.Class.create(enchant.Label, {
     initialize: function(){
         enchant.Label.call(this);
+        var core = enchant.Core.instance;
         this.font = "32px sans bold";
         this.color = "red";
         this.addEventListener('enterframe', function(){
-                this.text = enchant.Core.instance.score + "Pt";
+                this.text = core.score + "Pt";
+                if(core.score > 20000){
+                    core.endFunc();
+                }
         });
     }
 });

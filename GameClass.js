@@ -1,4 +1,63 @@
 var core = enchant.Core.instance;
+
+var StartScene = enchant.Class.create(enchant.Scene, {
+    initialize: function(){
+        enchant.Scene.call(this);
+        StartScene.instance = this;
+        var core = enchant.Core.instance;
+        this.backgroundColor = "#f9f9f9";;
+
+        var label = new Label("");
+        label.font = "64px sans";
+        label.color = "black";
+        label.text = "Cyln Drive";
+        label.y = 100;
+        this.addChild(label);
+        label.x = core.width/2 - label.width/2 - 35;
+        label.addEventListener('enterframe', function(){
+                this.x = core.width/2 - label.width/2 - 35;
+        });
+
+        var trial = new Label("");
+        trial.font = "32px sans bold";
+        trial.color = "red";
+        trial.text = "TRIAL MODE";
+        trial.y = 300;
+        this.addChild(trial);
+        trial.x = core.width/2 - trial.width/2;
+        trial.addEventListener('enterframe', function(){
+                this.x = core.width/2 - this.width/2;
+        });
+        trial.addEventListener('touchstart', function(){
+            core.popScene();
+            core.pushScene(new PlayScene());
+        });
+
+        //TODO
+        //他のモードはカミングスーンです
+        var select = new Label("");
+        select.font = "32px sans bold";
+        select.color = "DarkGray";
+        select.text = "STAGE SELECT";
+        select.y = 400;
+        this.addChild(select);
+        select.x = core.width/2 - select.width/2;
+        select.addEventListener('enterframe', function(){
+                this.x = core.width/2 - this.width/2;
+        });
+        var conf = new Label("");
+        conf.font = "32px sans bold";
+        conf.color = "DarkGray";
+        conf.text = "CONFIG";
+        conf.y = 500;
+        this.addChild(conf);
+        conf.x = core.width/2 - conf.width/2;
+        conf.addEventListener('enterframe', function(){
+                this.x = core.width/2 - this.width/2;
+        });
+    }
+});
+
 var PlayScene = enchant.Class.create(enchant.Scene, {
     initialize: function(){
         enchant.Scene.call(this);
@@ -94,8 +153,9 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                 uiWindow.currentTouchY = e.y;
         });
         uiWindow.addEventListener('touchmove', function(e){
+                var rotScale = 0.2;
                 var diff = e.y - uiWindow.currentTouchY;
-                Camera360.instance.rotX(Math.PI/90 * diff);
+                Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
                 uiWindow.currentTouchY = e.y;
         });
         uiWindow.addEventListener('touchend', function(e){
