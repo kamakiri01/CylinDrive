@@ -41,12 +41,14 @@ var StartScene = enchant.Class.create(enchant.Scene, {
     var sor = new Sprite(16, 16);
     sor.x = 135;
     sor.y = 309;
+    sor.buf = false;
     sor.image = new Surface(16, 16);
     sor.image.context.fillRect(0, 0, 16, 16);
     this.addChild(sor);
     sor.addEventListener('enterframe', function(){
-        sor.rotation += 8;
+            sor.rotation += 8;
     });
+
 
         //TODO
         //他のモードはカミングスーンです
@@ -69,6 +71,41 @@ var StartScene = enchant.Class.create(enchant.Scene, {
         conf.x = core.width/2 - conf.width/2;
         conf.addEventListener('enterframe', function(){
                 this.x = core.width/2 - this.width/2;
+        });
+
+        //キーイベント入力の受付
+        this.addEventListener('enterframe', function(){
+                //-----カーソルキーの動作
+                //
+                if(core.input.up){
+                    //core.keyEvent[0].inputUp();
+                    if(sor.buf === false){
+                        sor.buf = true;
+                        sor.y -= 100;
+                        if(sor.y < 300){
+                            sor.y += 300;
+                        }
+                    }
+                }else if(core.input.down){
+                    //core.keyEvent[0].inputDown();
+                    if(sor.buf === false){
+                        sor.buf = true;
+                        sor.y += 100;
+                        if(sor.y > 600){
+                            sor.y -= 300;
+                        }
+                    }
+                }else if(core.input.left){
+                }else if(core.input.right){
+                }else{
+                    sor.buf = false;
+                }
+                if(core.input.b){
+                    if(sor.y === 309){
+                        core.popScene();
+                        core.pushScene(new PlayScene());
+                    }
+                }
         });
     }
 });
@@ -185,26 +222,39 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
                 //-----カーソルキーの動作
                 //
                 if(core.input.up){
-                    core.keyEvent[0].inputUp();
+                    core.keyEvent[1].inputUp();
                 }
                 if(core.input.down){
-                    core.keyEvent[0].inputDown();
+                    core.keyEvent[1].inputDown();
                 }
                 if(core.input.left){
-                    core.keyEvent[0].inputLeft();
+                    core.keyEvent[1].inputLeft();
                 }
                 if(core.input.right){
-                    core.keyEvent[0].inputRight();
+                    core.keyEvent[1].inputRight();
                 }
         });
-        initKeyEvents();
     }
 });
 //キーイベントからカメラ回転イベントの呼び出し
 var initKeyEvents = function(){
     var core = enchant.Core.instance;
+    core.keybind(' '.charCodeAt(0), 'b');//スペースキーの割り当て
     //フラグ0
+    //スタート画面
     core.keyEvent[0] = {
+        inputUp: function(){
+        },
+        inputDown: function(){
+        },
+        inputLeft: function(){
+        },
+        inputRight: function(){
+        }
+    };
+    //フラグ
+    //トライアルステージ
+    core.keyEvent[1] = {
         inputUp: function(){
             Camera360.instance.rotX(Math.PI/45);
         },
@@ -212,10 +262,10 @@ var initKeyEvents = function(){
             Camera360.instance.rotX(-Math.PI/45);
         },
         inputLeft: function(){
-            Camera360.instance.rotZ(Math.PI/45);
+            //Camera360.instance.rotZ(Math.PI/45);
         },
         inputRight: function(){
-            Camera360.instance.rotZ(-Math.PI/45);
+            //Camera360.instance.rotZ(-Math.PI/45);
         }
     };
 };
