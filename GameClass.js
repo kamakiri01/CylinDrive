@@ -12,11 +12,16 @@ var StartScene = enchant.Class.create(enchant.Scene, {
         label.color = "black";
         label.text = "Cyln Drive";
         label.y = 100;
-        this.addChild(label);
+        //this.addChild(label);
         label.x = core.width/2 - label.width/2 - 35;
         label.addEventListener('enterframe', function(){
                 this.x = core.width/2 - label.width/2 - 35;
         });
+        var tit = new Sprite(500, 155);
+        tit.image = core.assets[TITLE_IMG];
+        tit.y = 100;
+        tit.x = core.width/2 - tit.width/2;
+        this.addChild(tit);
 
         var trial = new Label("");
         trial.font = "32px sans bold";
@@ -31,7 +36,17 @@ var StartScene = enchant.Class.create(enchant.Scene, {
         trial.addEventListener('touchstart', function(){
             core.popScene();
             core.pushScene(new PlayScene());
-        });
+    });
+
+    var sor = new Sprite(16, 16);
+    sor.x = 135;
+    sor.y = 309;
+    sor.image = new Surface(16, 16);
+    sor.image.context.fillRect(0, 0, 16, 16);
+    this.addChild(sor);
+    sor.addEventListener('enterframe', function(){
+        sor.rotation += 8;
+    });
 
         //TODO
         //他のモードはカミングスーンです

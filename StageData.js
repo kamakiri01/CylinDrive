@@ -4,6 +4,7 @@ var setStageEvent = function(scene, stageNumber){
     stageEventData[stageNumber](scene);
 };
 stageEventData = [];
+//テストモード
 stageEventData[0] = function(scene){
     //テストとして扇状の弾を撃つ敵をランダムに出現させる
     scene.addEventListener('enterframe', function(){

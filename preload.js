@@ -18,5 +18,8 @@ var MAX_LAZER_STOCK = 6;
 var MAIN_BG = "./images/bg.png";
 IMAGE_PRELOAD.push(MAIN_BG);
 
+var TITLE_IMG = "./images/cyt.png";
+IMAGE_PRELOAD.push(TITLE_IMG);
+
 //configで逆回転設定させる時用
 var ROT_INVERT = 1;
