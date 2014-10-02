@@ -85,7 +85,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
                 this.lestSafeTime += 30;
             }else{
                 //ゲーム終了を呼び出す
-                enchant.Core.instance.endFunc();
+                enchant.Core.instance.endFunc2();
             }
         },
         shot1: function(){
@@ -166,27 +166,62 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             this.receiveOwnTouchStart[1] =  function(e){
                 console.log("ownStart2");
                 //TODO: 相対移動(fieldと同等)
+                //移動
+                //
+                Astro360.Player.PlayerBase.instance.receiveToMove(e);
+                //残弾があればレーザー発射
+                if(Astro360.Player.PlayerBase.instance.stockLazer >= 1){
+                    //レーザー中でなければ発射処理開始
+                    if(Astro360.Player.PlayerBase.instance.isDuringLazer === false){
+                        Astro360.Player.PlayerBase.instance.isDuringLazer = true; //レーザー
+                        Astro360.Player.PlayerBase.instance.stockLazer -= 1; //残弾消費
+                        Astro360.Player.PlayerBase.instance.shotLazer();
+                    }
+                }else{
+                }
+                //レーザー状態に関係なくノーマルショット判定を始める
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
             };
             this.receiveOwnTouchMove[1] = function(e){
                 console.log("ownMove2");
-                //TODO: 相対移動(fieldと同等)
+                //レーザー中でなければノーマルショット
+                Astro360.Player.PlayerBase.instance.receiveToMove(e);
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
             };
             this.receiveOwnTouchEnd[1] = function(e){
                 console.log("ownEnd2");
                 //TODO: 相対移動(fieldと同等)
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
+
             this.receiveFieldTouchStart[1] = function(e){
                 console.log("fieldStart2");
                 //TODO:レーザー発射開始
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
                 //TODO: 相対移動
+                var p = Astro360.Player.PlayerBase.instance;
+                p.preTargX = p.x - e.x;
+                p.preTargY = p.y - e.y;
+                console.log(p.preTargX);
+
             };
             this.receiveFieldTouchMove[1] = function(e){
                 console.log("fieldMove2");
+                //sヨット
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
                 //TODO: 相対移動
+                var p = Astro360.Player.PlayerBase.instance;
+                var px = e.x + p.preTargX + UI_WIDTH;
+                var py = e.y + p.preTargY;
+                var obj = {x: px, y: py};
+                console.log(obj);
+                p.targX = px;
+                p.targY = py;
             };
             this.receiveFieldTouchEnd[1] = function(e){
                 console.log("fieldEnd2");
                 //TODO: ショット停止
+                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
         },
 //-------------------------------------------------------
@@ -733,7 +768,7 @@ Astro360.UI.LazerGauge = enchant.Class.create(enchant.Group, {
         var sfg = new Surface(w, GAUGE_HEIGHT);
         var ctxg = sfg.context;
         ctxg.beginPath();
-        ctxg.fillStyle = 'rgb(155, 187, 89)';
+        ctxg.fillStyle = 'rgb(28, 120, 182)';
         ctxg. fillRect(0, 0, w, GAUGE_HEIGHT);
         gage.image = sfg;
         //レーザーの残弾を反映

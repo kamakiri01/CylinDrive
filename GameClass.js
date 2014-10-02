@@ -34,9 +34,9 @@ var StartScene = enchant.Class.create(enchant.Scene, {
                 this.x = core.width/2 - this.width/2;
         });
         trial.addEventListener('touchstart', function(){
-            core.popScene();
-            core.pushScene(new PlayScene());
-    });
+                core.popScene();
+                core.pushScene(new PlayScene());
+        });
 
     var sor = new Sprite(16, 16);
     sor.x = 135;
@@ -64,13 +64,22 @@ var StartScene = enchant.Class.create(enchant.Scene, {
         });
         var conf = new Label("");
         conf.font = "32px sans bold";
-        conf.color = "DarkGray";
-        conf.text = "CONFIG";
+        conf.color = "red";
+        conf.text = "CONFIG:PC MODE";
         conf.y = 500;
         this.addChild(conf);
         conf.x = core.width/2 - conf.width/2;
         conf.addEventListener('enterframe', function(){
                 this.x = core.width/2 - this.width/2;
+        });
+        conf.addEventListener('touchstart', function(){
+                if(core.conf.ui === 0){
+                    conf.text = "CONFIG:TOUCH MODE";
+                    core.conf.ui = 1;
+                }else{
+                    conf.text = "CONFIG:PC MODE";
+                    core.conf.ui = 0;
+                }
         });
 
         //キーイベント入力の受付
@@ -104,7 +113,21 @@ var StartScene = enchant.Class.create(enchant.Scene, {
                     if(sor.y === 309){
                         core.popScene();
                         core.pushScene(new PlayScene());
+                    }else if(sor.y === 509 && conf.buf === false){
+                        conf.buf = true;
+                        if(core.conf.ui === 0){
+                            conf.text = "CONFIG:TOUCH MODE";
+                            core.conf.ui = 1;
+                        }else{
+                            conf.text = "CONFIG:PC MODE";
+                            core.conf.ui = 0;
+                        }
+                    }else{
+                    
                     }
+                }else{
+
+                    conf.buf = false;
                 }
         });
     }
@@ -126,8 +149,6 @@ var PlayScene = enchant.Class.create(enchant.Scene, {
             upVectorY: -1,
             upVectorZ: 0
         };
-        core.conf = {}; //TODO仮置きオブジェクト
-        core.conf.ui = 0;
         var camera = new Camera360(cameraConf);
         //メインとUIのグループを定義
         var mainWindow = new enchant.Group();
