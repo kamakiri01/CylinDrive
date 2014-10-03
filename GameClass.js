@@ -16,10 +16,11 @@ var SceneManager = (function(){
                 currentScene.removeChild(currentGroup);
             }
             currentScene.addChild(group);
+            currentGroup = group;
             _groups.push(group);
         }
         var popGroup = function(){
-            if(_groups.length < 1){
+            if(_groups.length <= 1){
                 return;
             }
             currentScene.removeChild(currentGroup);
@@ -27,6 +28,7 @@ var SceneManager = (function(){
             _groups.pop();
         }
         return {
+            instance: this,
             pushGroup: pushGroup,
             popGroup: popGroup
         }
@@ -65,8 +67,8 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 this.x = core.width/2 - this.width/2;
         });
         trial.addEventListener('touchstart', function(){
-                SceneManager.instance.popGroup();
-                SceneManager.instance.pushGroup(new PlayScene());
+                //core.sceneManager.popGroup();
+                core.sceneManager.pushGroup(new PlayScene());
                 //core.popScene();
                 //core.pushScene(new PlayScene());
         });

@@ -9,7 +9,9 @@ window.onload = function(){
     initKeyEvents();
     core.preload(IMAGE_PRELOAD);
     core.onload = function(){
-        core.pushScene(new StartScene());
+        core.sceneManager = new SceneManager();
+        core.sceneManager.pushGroup(new StartScene());
+        //core.pushScene(new StartScene());
     };
     core.endFunc = function(){
         var score = PlayScene.instance.age / core.fps;
