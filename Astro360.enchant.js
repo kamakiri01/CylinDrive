@@ -732,30 +732,6 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
 Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
             enchant.Group.call(this);
-            var bg = new Sprite(CORE_WIDTH*2, CORE_HEIGHT*3);
-            bg.image = enchant.Core.instance.assets[MAIN_BG];
-            bg.opacity = 0.6;
-            bg.addEventListener('enterframe', function(){
-                    this.x -= 1;
-                    if(this.x < -CORE_WIDTH){
-                        this.x += CORE_WIDTH;
-                    }
-                    var dif = (Camera360.instance.theta % Math.PI)/Math.PI;
-                    this.y = (dif * CORE_HEIGHT) - CORE_HEIGHT;
-            });
-            this.addChild(bg);
-            for(var i=0;i<50;i++){
-                var dot = new Dot();
-                Sprite360.add360Methods(dot);
-                var theta = Math.random() * 2 * Math.PI;
-                dot.px = (Math.random() * CORE_WIDTH * 1.3 - 100) * 20;
-                dot.py = Camera360.instance.z * 10 * Math.cos(theta); //初期値はzなのでこれで良い
-                dot.pz = Camera360.instance.z * 10 * Math.sin(theta);
-                dot.accX = 0;
-                dot.accY = 0;
-                dot.opacity = 0.3;
-                this.addChild(dot);
-            }
         }
 });
 //レーザーゲージ

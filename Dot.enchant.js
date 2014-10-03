@@ -11,8 +11,8 @@ var Dot = enchant.Class.create(enchant.Sprite,{
     initialize: function(){
         enchant.Sprite.call(this,DOT_SIZE, DOT_SIZE);
         var core = enchant.Core.instance;
-        var WIDTH = core.width;
-        var HEIGHT =core.height;
+        var WIDTH = CORE_WIDTH;//core.width;
+        var HEIGHT = CORE_HEIGHT;//core.height;
         //再利用できるSurfaceを生成する(色変更に対応するため)   
         if(Dot.surface === undefined){
             Dot.surface = new enchant.Surface(Dot.colors.length * DOT_SIZE, DOT_SIZE);
@@ -44,6 +44,7 @@ var Dot = enchant.Class.create(enchant.Sprite,{
 
         this.accX = Math.round(this.polarR * Math.cos(this.polarT)) * SPEED_SCALE;
         this.accY = Math.round(this.polarR * Math.sin(this.polarT)) * SPEED_SCALE;
+        console.log(Dot.surface);
         this.image = Dot.surface;
         this.frame = Math.floor(Math.random() * Dot.colors.length);
 
@@ -73,13 +74,21 @@ var Dot = enchant.Class.create(enchant.Sprite,{
         this.parentNode.removeChild(this);
         delete dots[this.num];
         this.removeEventListener('enterframe', arguments.callee);
-    }
+    },
+//    surface: function(){
+//        console.log("load Dot");
+//        if(Dot.surface === undefined){
+//            Dot.surface = new enchant.Surface(Dot.colors.length * DOT_SIZE, DOT_SIZE);
+//            for(var i=0;i<Dot.colors.length * DOT_SIZE;i+=DOT_SIZE){
+//                Dot.surface.context.fillStyle = 'rgb(' + Dot.colors[i/DOT_SIZE] + ')';
+//                Dot.surface.context.fillRect(i, 0, DOT_SIZE, DOT_SIZE);
+//            }
+//        }
+//    }
 });
 //Dot.colors = ['255,255,255', '255,0,0', '255,165,0', '255,255,0', '0,255,0', '0,0,255', '0,0,128', '128,0,128', '255,255,255'];
 //Dot.colors = ['127,135,143','200,200,203','255,40,0']; //グレー、明るいグレー、赤
 Dot.colors = ['0, 255, 255', '51, 255, 51', '204, 255, 204'];
-
-
 //ドットを撒く
 var DotWindow = enchant.Class.create(enchant.Group, {
     initialize: function(){

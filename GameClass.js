@@ -1,6 +1,4 @@
 var core = enchant.Core.instance;
-
-//Sceneが使えないのでGroup周りを代替する
 var SceneManager = (function(){
         var core = enchant.Core.instance;
         if(core.rootScene === undefined){
@@ -213,6 +211,9 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 
         //シリンダー回転タッチ操作用変数
         uiWindow.currentTouchY = 0;
+
+        //Dot.surface参照が切れる不都合対応
+        var d = new Dot();
 
 //------------------------------------------------------
         var p = new Astro360.Player.PlayerBase();
