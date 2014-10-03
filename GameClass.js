@@ -1,8 +1,39 @@
 var core = enchant.Core.instance;
 
-var StartScene = enchant.Class.create(enchant.Scene, {
+//Sceneが使えないのでGroup周りを代替する
+var SceneManager = (function(){
+        var core = enchant.Core.instance;
+        if(core.rootScene === undefined){
+            throw new Error('rootScene is not defined, yet.create this after enchant.start()');
+        }else{
+            SceneManager.instance = this;
+        }
+        var currentScene = core.currentScene;
+        var currentGroup;
+        var _groups = [];
+        var pushGroup = function(group){
+            if(currentGroup !== undefined){
+                currentScene.removeChild(currentGroup);
+            }
+            currentScene.addChild(group);
+            _groups.push(group);
+        }
+        var popGroup = function(){
+            if(_groups.length < 1){
+                return;
+            }
+            currentScene.removeChild(currentGroup);
+            currentScene.addChild(_groups[_groups.length - 2]);
+            _groups.pop();
+        }
+        return {
+            pushGroup: pushGroup,
+            popGroup: popGroup
+        }
+});
+var StartScene = enchant.Class.create(enchant.Group, {
     initialize: function(){
-        enchant.Scene.call(this);
+        enchant.Group.call(this);
         StartScene.instance = this;
         var core = enchant.Core.instance;
         this.backgroundColor = "#f9f9f9";;
@@ -34,10 +65,11 @@ var StartScene = enchant.Class.create(enchant.Scene, {
                 this.x = core.width/2 - this.width/2;
         });
         trial.addEventListener('touchstart', function(){
-                core.popScene();
-                core.pushScene(new PlayScene());
+                SceneManager.instance.popGroup();
+                SceneManager.instance.pushGroup(new PlayScene());
+                //core.popScene();
+                //core.pushScene(new PlayScene());
         });
-
     var sor = new Sprite(16, 16);
     sor.x = 135;
     sor.y = 309;
@@ -48,8 +80,6 @@ var StartScene = enchant.Class.create(enchant.Scene, {
     sor.addEventListener('enterframe', function(){
             sor.rotation += 8;
     });
-
-
         //TODO
         //他のモードはカミングスーンです
         var select = new Label("");
@@ -111,8 +141,9 @@ var StartScene = enchant.Class.create(enchant.Scene, {
                 }
                 if(core.input.b){
                     if(sor.y === 309){
-                        core.popScene();
-                        core.pushScene(new PlayScene());
+                        var g = new PlayScene();
+                        //core.popScene();
+                        //core.pushScene(new PlayScene());
                     }else if(sor.y === 509 && conf.buf === false){
                         conf.buf = true;
                         if(core.conf.ui === 0){
@@ -133,11 +164,13 @@ var StartScene = enchant.Class.create(enchant.Scene, {
     }
 });
 
-var PlayScene = enchant.Class.create(enchant.Scene, {
+var PlayScene = enchant.Class.create(enchant.Group, {
     initialize: function(){
-        enchant.Scene.call(this);
+        enchant.Group.call(this);
         PlayScene.instance = this;
         var core = enchant.Core.instance;
+        var scene = core.currentScene;
+        scene.addChild(this);
         var cameraConf = {
             x: core.width / 2,
             y: 0,
