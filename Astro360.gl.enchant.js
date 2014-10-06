@@ -1,6 +1,6 @@
 var BgWallCube = enchant.Class.create(enchant.gl.primitive.Cube,{
         initialize: function(scale, color){
-            enchant.gl.primitive.Cube.call(this,GL_SCALE_WALLCUBE);
+            enchant.gl.primitive.Cube.call(this,GL_SCALE_WALLCUBE * scale);
             this.mesh.setBaseColor(color);
             this.mesh.texture.ambient  = [0.4, 0.4, 0.4, 1]; //環境光
             this.mesh.texture.diffuse  = [0.7, 0.7, 0.7, 1]; //
@@ -17,7 +17,7 @@ var BgWallCube = enchant.Class.create(enchant.gl.primitive.Cube,{
 });
 var BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylinder,{
         initialize: function(phi,theta,color){
-            enchant.gl.primitive.Cylinder.call(this,30,100 ,8); //this, 半径、長さ、メッシュ細かさ
+            enchant.gl.primitive.Cylinder.call(this,80,100 ,8); //this, 半径、長さ、メッシュ細かさ
             var core = enchant.Core.instance;
             var camera = Camera360.instance;
 

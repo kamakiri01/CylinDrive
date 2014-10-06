@@ -735,7 +735,7 @@ Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
             if(window['gl']){
                 console.log("gl enable");
                 var bg3d = Astro360.UI.MainBg3D();
-                //addChild不要
+                //Scene3d適用によるGroupのあたり判定作成用の透明背景
                 var bg2d = new Sprite(CORE_WIDTH, CORE_HEIGHT);
                 bg2d.image = new Surface(CORE_WIDTH, CORE_HEIGHT);
                 bg2d.opacity = 0.0001;
@@ -751,7 +751,6 @@ Astro360.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
             var scene3d = new Scene3D(); //シングルトンなので既存インスタンスが戻る
             var core = enchant.Core.instance;
             var camera = core.currentScene3D.getCamera();
-            console.log(camera);
             camera.x = 0;
             camera.y = 0;
             camera.z = 0;
@@ -771,28 +770,45 @@ Astro360.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
             scene3d.backgroundColor = [0.1, 0.2, 0.25, 1];
             scene3d.setDirectionalLight(dLight);
             scene3d.setAmbientLight(aLight);
+
             //全体の背景となるシリンダーを作成
-            var c = new BgWallCylinder(-90, 0, '#ff3333');//red
+            var c = new BgWallCylinder(-0, 0, '#ff3333');//red
             c.x = 0;
-            c.y = GL_CAMDIST/2;
+            c.y = 0;//GL_CAMDIST/2;
             c.z = 0;
             scene3d.addChild(c);
 
-            var theta = Camera360.instance.theta;
-            core.sceneManager.currentScene.addEventListener('enterframe', function() {
-                    camera.x = 0;
-                    camera.y = Math.cos(theta) * GL_CAMDIST;
-                    camera.z = Math.sin(theta) * GL_CAMDIST;
+            //シリンダー内壁にあるブロック
+            var len = 2;
+            var distScale = 0.7;
+            for(var i=0;i<len;i++){
+                var polarT = Math.random() * Math.PI*2;
+                var polarR = GL_CAMDIST;
+
+                var b = new BgWallCube(10, "#ff3333");
+                b.x = 0;//Math.random() * 100;
+                b.y = 0;// Math.round(polarR * Math.cos(polarT)) * distScale; 
+                b.z = 0;//Math.round(polarR * Math.sin(polarT)) * distScale;
+                scene3d.addChild(b);
+            }
+            
+            //3dカメラの回転追従処理
+            core.currentScene.addEventListener('enterframe', function() {
+                    var theta = Camera360.instance.theta;
+                    var camera = core.currentScene3D.getCamera();
+                    camera.y = 0;
+                    camera.x = Math.cos(theta) * GL_CAMDIST*1;
+                    camera.z = Math.sin(theta) * GL_CAMDIST*1;
                     //camera.x = 0;
                     //camera.y = GL_CAMDIST;
                     //camera.z = 0;
-                    camera.upVectorX = 0;
-                    camera.upVectorY = Math.cos(theta + Math.PI/2);
-                    camera.upVectorZ = Math.sin(theta + Math.PI/2);
+                    camera.upVectorY = 0;
+                    camera.upVectorX = -Math.cos(theta + Math.PI/2);
+                    camera.upVectorZ = -Math.sin(theta + Math.PI/2);
                     dLight.directionY = Math.cos(theta);
-                    dLight.directionZ = Math.cos(theta);
-                    aLight.directionY = Math.sin(theta);
-                    aLight.directionZ = Math.sin(theta);
+                    dLight.directionZ = Math.sin(theta);
+                    //aLight.directionY = -Math.sin(theta);
+                    //aLight.directionZ = -Math.sin(theta);
             });
         }
 });

@@ -25,6 +25,6 @@ var TX_IMG = "./images/tx.png";
 IMAGE_PRELOAD.push(TX_IMG);
 
 GL_CAMDIST = 90;
-GL_SCALE_WALLCUBE = 10;
+GL_SCALE_WALLCUBE = 1;
 //configで逆回転設定させる時用
 var ROT_INVERT = 1;

@@ -9,7 +9,7 @@ window.onload = function(){
     initKeyEvents();
     core.preload(IMAGE_PRELOAD);
     core.onload = function(){
-        core.sceneManager = new SceneManager();
+        core.sceneManager =  new GameClass.SceneManager();
         core.sceneManager.pushGroup(new StartScene());
     };
     core.endFunc = function(){

@@ -1,19 +1,17 @@
+var GameClass = {};
+
 var core = enchant.Core.instance;
-var SceneManager = (function(){
+GameClass.SceneManager = function(){
         var core = enchant.Core.instance;
-        if(core.rootScene === undefined){
-            throw new Error('rootScene is not defined, yet.create this after enchant.start()');
-        }else{
-            SceneManager.instance = this;
-        }
-        var currentGroup;
+        //if(core.rootScene === undefined){
+        //    throw new Error('rootScene is not defined, yet.create this after enchant.start()');
+        //}
+        var currentGroup = undefined;
         var _groups = [];
         var pushGroup = function(group){
-            if(currentGroup !== undefined){
-                core.currentScene.removeChild(currentGroup);
-            }
+            core.currentScene.removeChild(this.currentGroup);
             core.currentScene.addChild(group);
-            currentGroup = group;
+            this.currentGroup = group;
             _groups.push(group);
         }
         var popGroup = function(){
@@ -25,12 +23,11 @@ var SceneManager = (function(){
             _groups.pop();
         }
         return {
-            instance: this,
             pushGroup: pushGroup,
             popGroup: popGroup,
-            currentScene: core.currentScene
+            currentGroup: currentGroup
         }
-});
+};
 var StartScene = enchant.Class.create(enchant.Group, {
     initialize: function(){
         enchant.Group.call(this);
