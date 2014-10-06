@@ -1,7 +1,7 @@
 /**
  * @fileOverview
  * gl.enchant.js
- * @version 0.3.7
+ * @version 0.3.6
  * @require enchant.js v0.4.5+
  * @require gl-matrix.js 1.3.7+
  * @author Ubiquitous Entertainment Inc.
@@ -14,6 +14,7 @@
  * Uses gl-matrix.js in vector, matrix operation.
  * gl-matrix.js:
  * https://github.com/toji/gl-matrix/
+ *
  */
 
 /**
@@ -111,7 +112,7 @@ if (typeof glMatrixArrayType === 'undefined') {
             var that = this;
             var stage = document.getElementById('enchant-stage');
             var cvs = this._canvas = createGLCanvas(width, height, scale);
-            var detect = new enchant.Sprite(width, height);
+            detect = new enchant.Sprite(width, height);
             var core = enchant.Core.instance;
             (function() {
                 var color = new Uint8Array(4);
@@ -1654,6 +1655,7 @@ if (typeof glMatrixArrayType === 'undefined') {
          *   var sp = new Sprite3D();
          *   sp.set(core.assets['sample.dae']);
          *   //Becomes Sprite3D with sample.dae model information
+         *
          */
         set: function(sprite) {
             for (var prop in sprite) {
@@ -2164,7 +2166,7 @@ if (typeof glMatrixArrayType === 'undefined') {
             this.invMat = mat4.identity();
             this.invMatY = mat4.identity();
             this._projMat = mat4.create();
-            mat4.perspective(20, core.width / core.height, 1.0, 1000.0, this._projMat);
+            mat4.perspective(80, core.width / core.height, 1.0, 1000.0, this._projMat);
             this._changedPosition = false;
             this._changedCenter = false;
             this._changedUpVector = false;

@@ -732,6 +732,68 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
 Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
             enchant.Group.call(this);
+            if(window['gl']){
+                console.log("gl enable");
+                var bg3d = Astro360.UI.MainBg3D();
+                //addChild不要
+                var bg2d = new Sprite(CORE_WIDTH, CORE_HEIGHT);
+                bg2d.image = new Surface(CORE_WIDTH, CORE_HEIGHT);
+                bg2d.opacity = 0.0001;
+                this.addChild(bg2d);
+            }else{
+                console.log("gl disable");
+            }
+        }
+});
+Astro360.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
+        initialize: function(){
+            enchant.gl.Scene3D.call(this);
+            var scene3d = new Scene3D(); //シングルトンなので既存インスタンスが戻る
+            var core = enchant.Core.instance;
+            var camera = core.currentScene3D.getCamera();
+            console.log(camera);
+            camera.x = 0;
+            camera.y = 0;
+            camera.z = 0;
+            camera.centerX = 0;
+            camera.centerY = 0;
+            camera.centerZ = 0;
+            camera.upVectorX = 0;
+            camera.upVectorY = 1;
+            camera.upVectorZ = 0;
+
+            var dLight = new DirectionalLight();
+            dLight.color = [1.0, 1.0, 1.0];
+            var aLight = new AmbientLight();
+            aLight.color = [1.0, 1.0, 1.0];
+
+            var scene3d = enchant.Core.instance.currentScene3D;
+            scene3d.backgroundColor = [0.1, 0.2, 0.25, 1];
+            scene3d.setDirectionalLight(dLight);
+            scene3d.setAmbientLight(aLight);
+            //全体の背景となるシリンダーを作成
+            var c = new BgWallCylinder(-90, 0, '#ff3333');//red
+            c.x = 0;
+            c.y = GL_CAMDIST/2;
+            c.z = 0;
+            scene3d.addChild(c);
+
+            var theta = Camera360.instance.theta;
+            core.sceneManager.currentScene.addEventListener('enterframe', function() {
+                    camera.x = 0;
+                    camera.y = Math.cos(theta) * GL_CAMDIST;
+                    camera.z = Math.sin(theta) * GL_CAMDIST;
+                    //camera.x = 0;
+                    //camera.y = GL_CAMDIST;
+                    //camera.z = 0;
+                    camera.upVectorX = 0;
+                    camera.upVectorY = Math.cos(theta + Math.PI/2);
+                    camera.upVectorZ = Math.sin(theta + Math.PI/2);
+                    dLight.directionY = Math.cos(theta);
+                    dLight.directionZ = Math.cos(theta);
+                    aLight.directionY = Math.sin(theta);
+                    aLight.directionZ = Math.sin(theta);
+            });
         }
 });
 //レーザーゲージ

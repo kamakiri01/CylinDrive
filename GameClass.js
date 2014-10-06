@@ -6,14 +6,13 @@ var SceneManager = (function(){
         }else{
             SceneManager.instance = this;
         }
-        var currentScene = core.currentScene;
         var currentGroup;
         var _groups = [];
         var pushGroup = function(group){
             if(currentGroup !== undefined){
-                currentScene.removeChild(currentGroup);
+                core.currentScene.removeChild(currentGroup);
             }
-            currentScene.addChild(group);
+            core.currentScene.addChild(group);
             currentGroup = group;
             _groups.push(group);
         }
@@ -21,14 +20,15 @@ var SceneManager = (function(){
             if(_groups.length <= 1){
                 return;
             }
-            currentScene.removeChild(currentGroup);
-            currentScene.addChild(_groups[_groups.length - 2]);
+            core.currentScene.removeChild(currentGroup);
+            core.currentScene.addChild(_groups[_groups.length - 2]);
             _groups.pop();
         }
         return {
             instance: this,
             pushGroup: pushGroup,
-            popGroup: popGroup
+            popGroup: popGroup,
+            currentScene: core.currentScene
         }
 });
 var StartScene = enchant.Class.create(enchant.Group, {
@@ -36,8 +36,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         enchant.Group.call(this);
         StartScene.instance = this;
         var core = enchant.Core.instance;
-        this.backgroundColor = "#f9f9f9";;
-
+        //core.currentScene.backgroundColor = "#f9f9f9";
         var label = new Label("");
         label.font = "64px sans";
         label.color = "black";
@@ -53,7 +52,6 @@ var StartScene = enchant.Class.create(enchant.Group, {
         tit.y = 100;
         tit.x = core.width/2 - tit.width/2;
         this.addChild(tit);
-
         var trial = new Label("");
         trial.font = "32px sans bold";
         trial.color = "red";
@@ -65,10 +63,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 this.x = core.width/2 - this.width/2;
         });
         trial.addEventListener('touchstart', function(){
-                //core.sceneManager.popGroup();
                 core.sceneManager.pushGroup(new PlayScene());
-                //core.popScene();
-                //core.pushScene(new PlayScene());
         });
     var sor = new Sprite(16, 16);
     sor.x = 135;
@@ -140,10 +135,8 @@ var StartScene = enchant.Class.create(enchant.Group, {
                     sor.buf = false;
                 }
                 if(core.input.b){
-                    if(sor.y === 309){
-                        var g = new PlayScene();
-                        //core.popScene();
-                        //core.pushScene(new PlayScene());
+                    if(sor.y === 309 && conf.buf === false){
+                        core.sceneManager.pushGroup(new PlayScene());
                     }else if(sor.y === 509 && conf.buf === false){
                         conf.buf = true;
                         if(core.conf.ui === 0){
@@ -244,8 +237,9 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 //------------------------------------------------------
 // MainWindowフィールドタッチイベント定義
 //------------------------------------------------------
-        //メイン画面のタッチイベントを自機に送る
+//メイン画面のタッチイベントを自機に送る
         mainWindow.addEventListener('touchstart', function(e){
+                console.log("touchstart");
                 p.receiveFieldTouchStart[core.conf.ui](e);
         });
         mainWindow.addEventListener('touchmove', function(e){
@@ -344,11 +338,9 @@ function onWheel(e) {
 		e.preventDefault();
         //下にスクロールした場合の処理
             Camera360.instance.rotX(-Math.PI/45 * 2);
-        console.log(e);
 	} else if (delta > 0){
 		e.preventDefault();
 		//上にスクロールした場合の処理
             Camera360.instance.rotX(Math.PI/45 * 2);
-        console.log(e);
 	}
 }

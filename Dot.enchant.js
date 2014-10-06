@@ -44,7 +44,6 @@ var Dot = enchant.Class.create(enchant.Sprite,{
 
         this.accX = Math.round(this.polarR * Math.cos(this.polarT)) * SPEED_SCALE;
         this.accY = Math.round(this.polarR * Math.sin(this.polarT)) * SPEED_SCALE;
-        console.log(Dot.surface);
         this.image = Dot.surface;
         this.frame = Math.floor(Math.random() * Dot.colors.length);
 

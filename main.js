@@ -11,17 +11,16 @@ window.onload = function(){
     core.onload = function(){
         core.sceneManager = new SceneManager();
         core.sceneManager.pushGroup(new StartScene());
-        //core.pushScene(new StartScene());
     };
     core.endFunc = function(){
         var score = PlayScene.instance.age / core.fps;
         score = Math.round(score * 10) / 10;
-        core.end(score, score + "秒でトライアルクリア");
+        //core.end(score, score + "秒でトライアルクリア");
     };
     core.endFunc2 = function(){
         var score = PlayScene.instance.age / core.fps;
         score = Math.round(score * 10) / 10;
-        core.end(0, score + "秒で撃墜された");
+        //core.end(0, score + "秒で撃墜された");
     };
     core.start();
 };

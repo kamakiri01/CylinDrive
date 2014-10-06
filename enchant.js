@@ -1414,11 +1414,9 @@ enchant.EventTarget = enchant.Class.create({
                     sprite.image.context.font = (size - 1) + 'px bold Helvetica,Arial,sans-serif';
                     var width = sprite.image.context.measureText('Touch to Start').width;
                     sprite.image.context.fillText('Touch to Start', (core.width - width) / 2, size - 1);
-                    console.log("_activated is true");
                     scene.addChild(sprite);
-                    document.addEventListener('touchend', function waitTouch() {
-                            console.log("activated and start");
-                        document.removeEventListener('touchend', waitTouch);
+                    document.addEventListener('mousedown', function waitTouch() {
+                        document.removeEventListener('mousedown', waitTouch);
                         core._touched = true;
                         core.removeScene(scene);
                         core.start(d);
