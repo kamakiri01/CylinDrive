@@ -732,9 +732,10 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
 Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
             enchant.Group.call(this);
+            //if(window['gl']){
             if(window['gl']){
                 console.log("gl enable");
-                var bg3d = Astro360.UI.MainBg3D();
+                var bg3d = Astro360.gl.UI.MainBg3D();
                 //Scene3d適用によるGroupのあたり判定作成用の透明背景
                 var bg2d = new Sprite(CORE_WIDTH, CORE_HEIGHT);
                 bg2d.image = new Surface(CORE_WIDTH, CORE_HEIGHT);
@@ -743,73 +744,6 @@ Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
             }else{
                 console.log("gl disable");
             }
-        }
-});
-Astro360.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
-        initialize: function(){
-            enchant.gl.Scene3D.call(this);
-            var scene3d = new Scene3D(); //シングルトンなので既存インスタンスが戻る
-            var core = enchant.Core.instance;
-            var camera = core.currentScene3D.getCamera();
-            camera.x = 0;
-            camera.y = 0;
-            camera.z = 0;
-            camera.centerX = 0;
-            camera.centerY = 0;
-            camera.centerZ = 0;
-            camera.upVectorX = 0;
-            camera.upVectorY = 1;
-            camera.upVectorZ = 0;
-
-            var dLight = new DirectionalLight();
-            dLight.color = [1.0, 1.0, 1.0];
-            var aLight = new AmbientLight();
-            aLight.color = [1.0, 1.0, 1.0];
-
-            var scene3d = enchant.Core.instance.currentScene3D;
-            scene3d.backgroundColor = [0.1, 0.2, 0.25, 1];
-            scene3d.setDirectionalLight(dLight);
-            scene3d.setAmbientLight(aLight);
-
-            //全体の背景となるシリンダーを作成
-            var c = new BgWallCylinder(-0, 0, '#ff3333');//red
-            c.x = 0;
-            c.y = -10;//GL_CAMDIST/2;
-            c.z = 0;
-            scene3d.addChild(c);
-
-            //シリンダー内壁にあるブロック
-            var len = 0;
-            var distScale = 0.7;
-            for(var i=0;i<len;i++){
-                var polarT = Math.random() * Math.PI*2;
-                var polarR = GL_CAMDIST;
-
-                var b = new BgWallCube(10, "#ff3333");
-                b.x = 0;//Math.random() * 100;
-                b.y = 0;// Math.round(polarR * Math.cos(polarT)) * distScale; 
-                b.z = 0;//Math.round(polarR * Math.sin(polarT)) * distScale;
-                scene3d.addChild(b);
-            }
-            
-            //3dカメラの回転追従処理
-            core.currentScene.addEventListener('enterframe', function() {
-                    var theta = Camera360.instance.theta;
-                    var camera = core.currentScene3D.getCamera();
-                    camera.y = 0;
-                    camera.x = Math.cos(theta) * GL_CAMDIST*1;
-                    camera.z = Math.sin(theta) * GL_CAMDIST*1;
-                    //camera.x = 0;
-                    //camera.y = GL_CAMDIST;
-                    //camera.z = 0;
-                    camera.upVectorY = 0;
-                    camera.upVectorX = -Math.cos(theta + Math.PI/2);
-                    camera.upVectorZ = -Math.sin(theta + Math.PI/2);
-                    dLight.directionY = Math.cos(theta);
-                    dLight.directionZ = Math.sin(theta);
-                    //aLight.directionY = -Math.sin(theta);
-                    //aLight.directionZ = -Math.sin(theta);
-            });
         }
 });
 //レーザーゲージ

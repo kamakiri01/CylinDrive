@@ -33,7 +33,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         enchant.Group.call(this);
         StartScene.instance = this;
         var core = enchant.Core.instance;
-        //core.currentScene.backgroundColor = "#f9f9f9";
+        core.currentScene.backgroundColor = "#f9f9f9";
         var label = new Label("");
         label.font = "64px sans";
         label.color = "black";
@@ -60,14 +60,22 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 this.x = core.width/2 - this.width/2;
         });
         trial.addEventListener('touchstart', function(){
+                core.currentScene.backgroundColor = null;
                 core.sceneManager.pushGroup(new PlayScene());
         });
+
+        //セレクタ
     var sor = new Sprite(16, 16);
     sor.x = 135;
     sor.y = 309;
     sor.buf = false;
     sor.image = new Surface(16, 16);
-    sor.image.context.fillRect(0, 0, 16, 16);
+    var ctx = sor.image.context;
+    ctx.fillStyle = 'rgba(1,1,1,1)';
+    ctx.fillRect(0, 0, 16, 16);
+    ctx.fillStyle = 'rgba(256,256,256,1)';;
+    ctx.rect(2, 2, 12, 12);
+    ctx.fill();
     this.addChild(sor);
     sor.addEventListener('enterframe', function(){
             sor.rotation += 8;
@@ -133,6 +141,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 }
                 if(core.input.b){
                     if(sor.y === 309 && conf.buf === false){
+                        core.currentScene.backgroundColor = null;
                         core.sceneManager.pushGroup(new PlayScene());
                     }else if(sor.y === 509 && conf.buf === false){
                         conf.buf = true;

@@ -15,14 +15,8 @@ var GAUGE_WIDTH = 50;
 var GAUGE_HEIGHT = 20;
 var MAX_LAZER_STOCK = 6;
 
-var MAIN_BG = "./images/bg.png";
-IMAGE_PRELOAD.push(MAIN_BG);
-
 var TITLE_IMG = "./images/cyt.png";
 IMAGE_PRELOAD.push(TITLE_IMG);
-
-var TX_IMG = "./images/tx.png";
-IMAGE_PRELOAD.push(TX_IMG);
 
 GL_CAMDIST = 90;
 GL_SCALE_WALLCUBE = 1;
