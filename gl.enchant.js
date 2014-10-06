@@ -2166,7 +2166,7 @@ if (typeof glMatrixArrayType === 'undefined') {
             this.invMat = mat4.identity();
             this.invMatY = mat4.identity();
             this._projMat = mat4.create();
-            mat4.perspective(80, core.width / core.height, 1.0, 1000.0, this._projMat);
+            mat4.perspective(60, core.width / core.height, 1.0, 1000.0, this._projMat);
             this._changedPosition = false;
             this._changedCenter = false;
             this._changedUpVector = false;

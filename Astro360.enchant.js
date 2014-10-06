@@ -774,12 +774,12 @@ Astro360.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
             //全体の背景となるシリンダーを作成
             var c = new BgWallCylinder(-0, 0, '#ff3333');//red
             c.x = 0;
-            c.y = 0;//GL_CAMDIST/2;
+            c.y = -10;//GL_CAMDIST/2;
             c.z = 0;
             scene3d.addChild(c);
 
             //シリンダー内壁にあるブロック
-            var len = 2;
+            var len = 0;
             var distScale = 0.7;
             for(var i=0;i<len;i++){
                 var polarT = Math.random() * Math.PI*2;
