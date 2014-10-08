@@ -33,17 +33,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         enchant.Group.call(this);
         StartScene.instance = this;
         var core = enchant.Core.instance;
-        core.currentScene.backgroundColor = "#f9f9f9";
-        var label = new Label("");
-        label.font = "64px sans";
-        label.color = "black";
-        label.text = "Cyln Drive";
-        label.y = 100;
-        //this.addChild(label);
-        label.x = core.width/2 - label.width/2 - 35;
-        label.addEventListener('enterframe', function(){
-                this.x = core.width/2 - label.width/2 - 35;
-        });
+        core.currentScene.backgroundColor = ColorSet.STARTSCENEBG;
         var tit = new Sprite(500, 155);
         tit.image = core.assets[TITLE_IMG];
         tit.y = 100;
@@ -51,7 +41,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         this.addChild(tit);
         var trial = new Label("");
         trial.font = "32px sans bold";
-        trial.color = "red";
+        trial.color = ColorSet.STARTSCENE_TEXT_ENABLE;
         trial.text = "TRIAL MODE";
         trial.y = 300;
         this.addChild(trial);
@@ -71,9 +61,9 @@ var StartScene = enchant.Class.create(enchant.Group, {
     sor.buf = false;
     sor.image = new Surface(16, 16);
     var ctx = sor.image.context;
-    ctx.fillStyle = 'rgba(1,1,1,1)';
+    ctx.fillStyle = ColorSet.STARTSCENE_SELECTOR0;
     ctx.fillRect(0, 0, 16, 16);
-    ctx.fillStyle = 'rgba(256,256,256,1)';;
+    ctx.fillStyle = ColorSet.STARTSCENE_SELECTOR1;
     ctx.rect(2, 2, 12, 12);
     ctx.fill();
     this.addChild(sor);
@@ -84,7 +74,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         //他のモードはカミングスーンです
         var select = new Label("");
         select.font = "32px sans bold";
-        select.color = "DarkGray";
+        select.color = ColorSet.STARTSCENE_TEXT_DISABLE;
         select.text = "STAGE SELECT";
         select.y = 400;
         this.addChild(select);
@@ -94,7 +84,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         });
         var conf = new Label("");
         conf.font = "32px sans bold";
-        conf.color = "red";
+        conf.color = ColorSet.STARTSCENE_TEXT_ENABLE;
         conf.text = "CONFIG:PC MODE";
         conf.y = 500;
         this.addChild(conf);

@@ -260,6 +260,7 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
             var sf = new enchant.Surface(96, 32);
             var ctx = sf.context;
             ctx.beginPath();
+            ctx.fillStyle = ColorSet.PLAYERBULLET;
             ctx.scale(1.8, 0.6);
             ctx.arc(30,35,15,0,Math.PI*2,false);
             ctx.stroke();
@@ -310,9 +311,9 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             ctx.beginPath();
 
             var grad  = ctx.createLinearGradient(0,0, 0, 32);
-            grad.addColorStop(0,'rgb(128, 100, 162)');  // 紫
-            grad.addColorStop(0.5,'rgb(255, 255, 255)'); // 緑
-            grad.addColorStop(1,'rgb(128, 100, 162)');  // 紫
+            grad.addColorStop(0,   ColorSet.PLAYERLAZER0);  // 紫
+            grad.addColorStop(0.5, ColorSet.PLAYERLAZER1); // 緑
+            grad.addColorStop(1,   ColorSet.PLAYERLAZER0);  // 紫
             /* グラデーションをfillStyleプロパティにセット */
             ctx.fillStyle = grad;
             ctx.rect(0,0, CORE_WIDTH,32);
@@ -399,8 +400,7 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle='#3333ff';     
-            this.sCtx.moveTo(12, 1);
+            this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
             this.sCtx.closePath();
@@ -417,7 +417,7 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle='#3333ff';     
+            this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
             this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
@@ -450,7 +450,7 @@ Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.E
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle='#3333ff';     
+            this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
             this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
@@ -703,7 +703,7 @@ Astro360.Methods.Enemy.gemLinearAccEnemyUnit = function(EnemyClass, enemyArg, po
 };
 //--------------------
 //インターフェース回りのクラス定義
-//回転スライダーのグループ
+//回転のためのスライダー
 Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
             enchant.Group.call(this);
@@ -712,20 +712,38 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
             var ctx = sf.context;
             ctx.beginPath();
             //外枠を黒\塗り
-            ctx.fillStyle = 'rgba(1, 1, 1, 1)';
+            ctx.fillStyle = ColorSet.UIBORDER;
             ctx.fillRect(0, 0, UI_WIDTH, CORE_HEIGHT);
-//            ctx.fillStyle = 'rgba(1, 100, 100, 100)';
-//            ctx. fillRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
             //グラデーション
-            var grad  = ctx.createLinearGradient(0,0, 0, CORE_HEIGHT*2);
-            grad.addColorStop(0,'rgba(1, 128, 100, 162)');  // 紫
-            grad.addColorStop(1,'rgb(255, 255, 255)'); // 緑
+            var grad  = ctx.createLinearGradient(0,0, 0, CORE_HEIGHT);
+            grad.addColorStop(0,  ColorSet.UIBG0);  // 紫
+            grad.addColorStop(0.5,ColorSet.UIBG1);  // 紫
+            grad.addColorStop(1,  ColorSet.UIBG0); // 緑
             /* グラデーションをfillStyleプロパティにセット */
             ctx.fillStyle = grad;
             ctx.rect(3,3, UI_WIDTH-6, CORE_HEIGHT-6);
             ctx.fill();
             bg.image = sf;
             this.addChild(bg);
+            this.addEventListener('enterframe', function(e){
+                    var core = enchant.Core.instance;
+                    var c = Camera360.instance;
+                    var theta = c.theta;
+                    var theta_height = e.y / CORE_HEIGHT;
+                    console.log(theta);
+                    //前フレームのグラデーションの削除
+                    ctx.clearRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
+                    //グラデーションの更新
+                    var grad  = ctx.createLinearGradient(0,0, 0, CORE_HEIGHT);
+                    grad.addColorStop(0,  ColorSet.UIBG0);
+                    grad.addColorStop(theta_height, ColorSet.UIBG1);
+                    grad.addColorStop(1,  ColorSet.UIBG0);
+                    /* グラデーションをfillStyleプロパティにセット */
+                    ctx.fillStyle = grad;
+                    ctx.rect(3,3, UI_WIDTH-6, CORE_HEIGHT-6);
+                    ctx.fill();
+
+            });
         }
 });
 //背景でぐるぐる回るやつ
@@ -746,7 +764,7 @@ Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
             }
         }
 });
-//レーザーゲージ
+//レーザーチャージゲージ
 Astro360.UI.LazerGauge = enchant.Class.create(enchant.Group, {
     initialize: function(){
         enchant.Group.call(this);
@@ -756,7 +774,7 @@ Astro360.UI.LazerGauge = enchant.Class.create(enchant.Group, {
         var sfg = new Surface(w, GAUGE_HEIGHT);
         var ctxg = sfg.context;
         ctxg.beginPath();
-        ctxg.fillStyle = 'rgb(28, 120, 182)';
+        ctxg.fillStyle = ColorSet.LAZERGAUGE;
         ctxg. fillRect(0, 0, w, GAUGE_HEIGHT);
         gage.image = sfg;
         //レーザーの残弾を反映
@@ -782,13 +800,14 @@ Astro360.UI.LazerGauge = enchant.Class.create(enchant.Group, {
     }
 });
 
+//残機表示スプライト
 Astro360.UI.LestUnit = enchant.Class.create(enchant.Sprite, {
     initialize: function(){
         enchant.Sprite.call(this, GAUGE_HEIGHT * 5, GAUGE_HEIGHT);
         var sf = new Surface(GAUGE_HEIGHT, GAUGE_HEIGHT);
         var ctx = sf.context;
         var rad = GAUGE_HEIGHT /2;
-        ctx.strokeStyle =  'rgba(192, 192, 192, 1)';
+        ctx.strokeStyle = ColorSet.LESTUNIT;
         ctx.beginPath();
         ctx.arc(rad, rad, rad, 0, Math.PI*2, true);
         ctx.arc(rad, rad, rad-4, 0, Math.PI*2, false);
@@ -805,12 +824,13 @@ Astro360.UI.LestUnit = enchant.Class.create(enchant.Sprite, {
     }
 });
 
+//獲得スコア表示ラベル
 Astro360.UI.ScoreLabel = enchant.Class.create(enchant.Label, {
     initialize: function(){
         enchant.Label.call(this);
         var core = enchant.Core.instance;
         this.font = "32px sans bold";
-        this.color = "red";
+        this.color = ColorSet.SCORELABEL;
         this.addEventListener('enterframe', function(){
                 this.text = core.score + "Pt";
                 if(core.score > 20000){

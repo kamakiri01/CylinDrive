@@ -30,7 +30,7 @@ Astro360.gl.UI.BgWallCube = enchant.Class.create(enchant.gl.primitive.Cube,{
         }
 });
 Astro360.gl.UI.BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylinder,{
-        initialize: function(phi,theta,color){
+        initialize: function(phi,theta){
             enchant.gl.primitive.Cylinder.call(this,80,200 ,20); //this, 半径、長さ、メッシュ細かさ
             var core = enchant.Core.instance;
             var camera = Camera360.instance;
@@ -45,9 +45,9 @@ Astro360.gl.UI.BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylind
             var gradColor;
             for(var i=0;i<len;i++){
                 if(i%2 ===0){
-                    gradColor = 'rgb(188, 100, 122)';
+                    gradColor = ColorSet.BGWALL0;
                 }else{
-                    gradColor = 'rgb(255, 255, 255)';
+                    gradColor = ColorSet.BGWALL1;
                 }
                 grad.addColorStop(i/len,gradColor);
             }
@@ -63,7 +63,7 @@ Astro360.gl.UI.BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylind
             this.mesh.texture.diffuse  = [0.7, 0.7, 0.7, 1]; //
             this.mesh.texture.specular = [0.1, 0.1, 0.1, 1]; //反射光
             //mat4.perspective(80, core.width / core.height, 1.0, 1000.0, this._projMat); 
-            ////視野角調整(魚眼化)これはgl.enchant.js本体で設定すること
+            ////視野角調整(魚眼化)これはgl.enchant.js本体で設定する
             this.mesh.texture.src = sf;
 
             this.mesh.reverse();
@@ -83,7 +83,7 @@ Astro360.gl.UI.BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylind
             this.addEventListener('enterframe' ,function(){
                     this.y += 1;
                     this.moved += 1;
-                    if(this.moved > 27){
+                    if(this.moved >= 27){
                         this.y -= 27;
                         this.moved = 0;
                     }
@@ -119,25 +119,25 @@ Astro360.gl.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
             scene3d.setAmbientLight(aLight);
 
             //全体の背景となるシリンダーを作成
-            var c = new Astro360.gl.UI.BgWallCylinder(-0, 0, '#ff3333');//red
+            var c = new Astro360.gl.UI.BgWallCylinder(0, 0);
             c.x = 0;
-            c.y = -10;//GL_CAMDIST/2;
+            c.y = -10;
             c.z = 0;
             scene3d.addChild(c);
 
-            //シリンダー内壁にあるブロック
-            var len = 0;
-            var distScale = 0.7;
-            for(var i=0;i<len;i++){
-                var polarT = Math.random() * Math.PI*2;
-                var polarR = GL_CAMDIST;
-
-                var b = new Astro360.gl.UI.BgWallCube(10, "#ff3333");
-                b.x = 0;//Math.random() * 100;
-                b.y = 0;// Math.round(polarR * Math.cos(polarT)) * distScale; 
-                b.z = 0;//Math.round(polarR * Math.sin(polarT)) * distScale;
-                scene3d.addChild(b);
-            }
+//            //シリンダー内壁にあるブロック
+//            var len = 0;
+//            var distScale = 0.7;
+//            for(var i=0;i<len;i++){
+//                var polarT = Math.random() * Math.PI*2;
+//                var polarR = GL_CAMDIST;
+//
+//                var b = new Astro360.gl.UI.BgWallCube(10, "#ff3333");
+//                b.x = 0;//Math.random() * 100;
+//                b.y = 0;// Math.round(polarR * Math.cos(polarT)) * distScale; 
+//                b.z = 0;//Math.round(polarR * Math.sin(polarT)) * distScale;
+//                scene3d.addChild(b);
+//            }
             
             //3dカメラの回転追従処理
             core.currentScene.addEventListener('enterframe', function() {
