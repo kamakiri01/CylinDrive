@@ -392,8 +392,10 @@ Astro360.Enemy.EnemyBase360Derivative = enchant.Class.create(Astro360.Enemy.Enem
             Astro360.Enemy.EnemyBase360.call(this, wx, wy);
     }
 });
-//適当な三角形のエネミー
-Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
+//シンプルな三角形の表示エネミー
+//@param
+//{}
+Astro360.Enemy.TriangeEnemy = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
             var sf = new Surface(20, 20);
@@ -409,6 +411,12 @@ Astro360.Enemy.TestEnemyBase360 = enchant.Class.create(Astro360.Enemy.EnemyBase3
         }
 });
 //加速度系処理を行う敵クラス(new時点のcore.thetaを参照)
+//@param
+//{
+//  acc:{x: int, y: int},
+//  vel:{x: int, y: int}
+//}
+//
 Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
         initialize: function(argObj){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
@@ -440,8 +448,15 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.accZ = accObj.z;
         }
 });
-//加速度系処理を行う敵クラス(new時点のcore.thetaを参照しない、argobjのみを利用する)
-//コンストラクタに引き渡すvel, accにはsetReferenceFromViewPositionを通すこと）
+//加速度系処理を行う敵クラス。ただし、new時点のcore.thetaを参照しない。
+//argobjで指定された座標をそのまま利用する)
+//TODO:コンストラクタに引き渡すvel, accにはCamera360.setReferenceFromViewPosition{x, y}を通すこと）
+//@param
+//{
+//  acc:{x: int, y: int, z: int},
+//  vel:{x: int, y: int, z: int}
+//}
+//
 Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
     initialize: function(argObj){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
@@ -563,12 +578,13 @@ Astro360.EnemyMotion.Acceleration = function(enem){
 //Astro360.EnemyBulletMotion //敵のショットモーション（タイミング含む）
 //-------------------------------------------------------
 //直進弾を撃つモーション
+//argobj = {spd: int, freq: int}
 Astro360.EnemyBulletMotion.StraightShot= function(enem, argObj){
     var freq = argObj.freq;
-    var num = argObj.num;
-    var spd = argObj.spd;
+    var spd  = argObj.spd;
     if(enem.age % freq === 0){
-        var b = new Astro360.EnemyBullet.TestBullet(spd);
+        //var b = new Astro360.EnemyBullet.TestBullet(spd);
+        var b = new enem.myBulletClass(spd);
         b.px = enem.px;
         b.py = enem.py;
         b.pz = enem.pz;
@@ -580,6 +596,11 @@ Astro360.EnemyBulletMotion.StraightShot= function(enem, argObj){
     }
 };
 //扇状に撃つモーション
+//@param
+//argObj = {num: int, 
+//          spd: int, 
+//          rad: int,
+//          freq:int,}
 Astro360.EnemyBulletMotion.RippleShot = function(enem, argObj){
     var freq = argObj.freq;
     if(enem.age % freq === 0){
@@ -627,6 +648,16 @@ Astro360.Methods.Enemy.gemParticle = function(e){
 //生成エネミークラス、生成初期位置、運動関数、運動引数、
 //バレットクラス、バレット関数、バレット引数
 //出現座標は固定、加速度・速度に対してgemEnemy内では処理を変えない
+//@param
+//Enemyclass     Astro360.Enemy             生成エネミークラス
+//enemyArg       {}                         生成引数                    エネミークラス依存
+//posArray       [{x:int, y:int}]           初期位置配列
+//motionfunc     Astro360.EnemyMotion       モーション関数
+//motionArg      {}                         モーション引数              モーション関数依存
+//BulletClass    Astro360.EnemyBullet       バレットクラス
+//bulletFunc     Astro360.EnemyBulletMotion バレットモーション関数
+//bulletArg      {}                         バレットモーション引数      バレットモーション関数依存
+//normalizeFrag  Bool                       その時点の鉛直平面に揃えるか
 Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, normalizeFrag){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
@@ -654,10 +685,21 @@ Astro360.Methods.Enemy.gemEnemy = function(EnemyClass, enemyArg, posArray, motio
         scene.mainWindow.addChild(e);
     }
 };
-
-//出現時点の回転状態などを固定して複数のエネミーを生成する。一定間隔で同じposobj座標に生成する
+//出現時点の回転状態などを固定して複数の加速系エネミーを生成する。一定間隔で同じposobj座標に生成する
 //settimeoutなのでCoreのフレーム対する遅延保証がない。遅い環境だとレイアウト崩れるかも。
-//実質的にAccEnemy360FixedReference専用の隊列生成メソッド
+//実質的にAstro360.Enemy.AccEnemy360FixedReference 専用の隊列生成メソッド
+//@param
+//Enemyclass     Astro360.Enemy             生成エネミークラス
+//enemyArg       {vel:{x:int, y:int}, acc:{x:int, y:int}}
+//posObj         {x:int, y:int} 出現座標
+//num            int                        繰り返し数
+//delay          int                        遅延
+//motionfunc     Astro360.EnemyMotion       モーション関数
+//motionArg      {}                         モーション引数              モーション関数依存
+//BulletClass    Astro360.EnemyBullet       バレットクラス
+//bulletFunc     Astro360.EnemyBulletMotion バレットモーション関数
+//bulletArg      {}                         バレットモーション引数      バレットモーション関数依存
+//referenceFrag
 Astro360.Methods.Enemy.gemLinearAccEnemyUnit = function(EnemyClass, enemyArg, posObj, num, delay, motionFunc, motionArg, BulletClass, bulletFunc, bulletArg, referenceFrag){
     var core = enchant.Core.instance;
     var scene = PlayScene.instance;
@@ -699,7 +741,6 @@ Astro360.Methods.Enemy.gemLinearAccEnemyUnit = function(EnemyClass, enemyArg, po
         }, 
         delay);
     }
-
 };
 //--------------------
 //インターフェース回りのクラス定義
