@@ -102,6 +102,14 @@ Camera360.prototype.rotN = function(x, y, z, t){
     //累積回転角の合算
     c.theta += t;
 }
+Camera360.prototype.delayRot = function(targetTheta, pastTheta, delay){
+    var c = Camera360.instance;
+    c.rotX(Math.PI/90);
+    var past = pastTheta + 1;
+    if(pastTheta < targetTheta){
+        setTimeout("Camera360.instance.delayRot(" + targetTheta + ", " + past + ")", delay);
+    }
+}
 Camera360.worldToScreen = function(x, y, z){
     var mul = function(m1, m2) {
         return mat4.multiply(m1, m2, mat4.create());

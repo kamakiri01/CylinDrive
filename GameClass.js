@@ -58,7 +58,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
     var sor = new Sprite(16, 16);
     sor.x = 135;
     sor.y = 309;
-    sor.buf = false;
+    sor.inputBuf = false;
     sor.image = new Surface(16, 16);
     var ctx = sor.image.context;
     ctx.fillStyle = ColorSet.STARTSCENE_SELECTOR0;
@@ -108,8 +108,8 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 //
                 if(core.input.up){
                     //core.keyEvent[0].inputUp();
-                    if(sor.buf === false){
-                        sor.buf = true;
+                    if(sor.inputBuf === false){
+                        sor.inputBuf = true;
                         sor.y -= 100;
                         if(sor.y < 300){
                             sor.y += 300;
@@ -117,8 +117,8 @@ var StartScene = enchant.Class.create(enchant.Group, {
                     }
                 }else if(core.input.down){
                     //core.keyEvent[0].inputDown();
-                    if(sor.buf === false){
-                        sor.buf = true;
+                    if(sor.inputBuf === false){
+                        sor.inputBuf = true;
                         sor.y += 100;
                         if(sor.y > 600){
                             sor.y -= 300;
@@ -127,14 +127,14 @@ var StartScene = enchant.Class.create(enchant.Group, {
                 }else if(core.input.left){
                 }else if(core.input.right){
                 }else{
-                    sor.buf = false;
+                    sor.inputBuf = false;
                 }
                 if(core.input.b){
-                    if(sor.y === 309 && conf.buf === false){
+                    if(sor.y === 309 && conf.inputBuf === false){
                         core.currentScene.backgroundColor = null;
                         core.sceneManager.pushGroup(new PlayScene());
-                    }else if(sor.y === 509 && conf.buf === false){
-                        conf.buf = true;
+                    }else if(sor.y === 509 && conf.inputBuf === false){
+                        conf.inputBuf = true;
                         if(core.conf.ui === 0){
                             conf.text = "CONFIG:TOUCH MODE";
                             core.conf.ui = 1;
@@ -146,8 +146,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
                     
                     }
                 }else{
-
-                    conf.buf = false;
+                    conf.inputBuf = false;
                 }
         });
     }
@@ -184,8 +183,15 @@ var PlayScene = enchant.Class.create(enchant.Group, {
         var mainBg = new Astro360.UI.MainBg();
         mainWindow.addChild(mainBg);
 
-        var uiBg = new Astro360.UI.UiBg();
-        uiWindow.addChild(uiBg);
+        //PC操作系の場合
+        if(core.conf.ui === 0){
+            var uiBg = new Astro360.UI.UiBg();
+            uiWindow.addChild(uiBg);
+        //スマホ操作系の場合
+        }else if(core.conf.ui === 1){
+            var uiBg = new Astro360.UI.UiBgSP();
+            uiWindow.addChild(uiBg);
+        }
 
         var gage = new Astro360.UI.LazerGauge();
         mainWindow.addChild(gage);
@@ -247,19 +253,23 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 //------------------------------------------------------
 // UiWindowタッチイベント定義
 //------------------------------------------------------
-        //UIタッチ操作で回転させる
-        uiWindow.addEventListener('touchstart', function(e){
-                uiWindow.currentTouchY = e.y;
-        });
-        uiWindow.addEventListener('touchmove', function(e){
-                var rotScale = 0.2;
-                var diff = e.y - uiWindow.currentTouchY;
-                Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
-                uiWindow.currentTouchY = e.y;
-        });
-        uiWindow.addEventListener('touchend', function(e){
-                uiWindow.currentTouchY = 0;
-        });
+        //PC操作系の場合
+        if(core.conf.ui === 0){
+            //UIタッチ操作で回転させる
+            uiWindow.addEventListener('touchstart', function(e){
+                    uiWindow.currentTouchY = e.y;
+            });
+            uiWindow.addEventListener('touchmove', function(e){
+                    var rotScale = 0.2;
+                    var diff = e.y - uiWindow.currentTouchY;
+                    Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
+                    uiWindow.currentTouchY = e.y;
+            });
+            uiWindow.addEventListener('touchend', function(e){
+                    uiWindow.currentTouchY = 0;
+            });
+        }
+        //スマホ操作系はGroup側で別個にイベント定義するのでGameClassからは触れない
 //------------------------------------------------------
 //ステージ構成
         setStageEvent(this, 0); //StageData.jsからステージデータを読み込む

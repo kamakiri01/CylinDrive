@@ -43,6 +43,7 @@ ColorSet.ENEMY_TRIANGLE = "#3333ff";
 ColorSet.ENEMY_ACCENEMY = "#11ff22";
 //UI
 ColorSet.UIBORDER = "rgba(1, 1, 1, 1)";
+ColorSet.UIBUTTON = "rgb(128, 100, 162)";
 ColorSet.UIBG0 = "rgba(1,   128, 100, 162)"; //背景色
 ColorSet.UIBG1 = "rgba(126, 191, 176, 162)"; //輝点色
 //LazerGauge

@@ -207,7 +207,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             };
             this.receiveFieldTouchMove[1] = function(e){
                 console.log("fieldMove2");
-                //sヨット
+                //ショット
                 Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
                 //TODO: 相対移動
                 var p = Astro360.Player.PlayerBase.instance;
@@ -865,6 +865,52 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
 
             });
         }
+});
+//スマホ操作系では45度回転ボタン、レーザーボタンをUIに含める
+Astro360.UI.UiBgSP = enchant.Class.create(enchant.Group, {
+        initialize: function(){
+            enchant.Group.call(this);
+            var upButton = new Sprite(UI_WIDTH, CORE_HEIGHT/3);
+            upButton.x = 0;
+            upButton.y = 0;
+            var downButton = new Sprite(UI_WIDTH, CORE_HEIGHT/3);
+            downButton.x = 0;
+            downButton.y = CORE_HEIGHT/3 * 2;
+            var lazerButton = new Sprite(UI_WIDTH, CORE_HEIGHT/3);
+            lazerButton.x = 0;
+            lazerButton.y = CORE_HEIGHT/3;
+            var sf = new Surface(UI_WIDTH, CORE_HEIGHT/3);
+            var ctx = sf.context;
+            //外枠を黒塗り
+            ctx.fillStyle = ColorSet.UIBORDER;
+            ctx.fillRect(0, 0, UI_WIDTH, CORE_HEIGHT/3);
+            ctx.fillStyle = ColorSet.UIBUTTON;
+            ctx.fillRect(3,3, UI_WIDTH-6, CORE_HEIGHT/3 - 6);
+            upButton.image = sf;
+            downButton.image = sf;
+            lazerButton.image = sf;
+            
+            upButton.addEventListener('touchstart', function(e){
+                    //45度回転
+                    Camera360.instance.delayRot(45, 0, 10);
+            });
+            downButton.addEventListener('touchstart', function(e){
+                //-45度回転
+                    Camera360.instance.delayRot(-45, 0, 10);
+            });
+            lazerButton.addEventListener('touchstart', function(e){
+                //レーザー発射
+                var p = Astro360.Player.PlayerBase.instance;
+                p.receiveOwnTouchStart[1]({x:p.x + UI_WIDTH + 16, y:p.y + 16});
+
+            });
+
+
+
+            this.addChild(upButton);
+            this.addChild(downButton);
+            this.addChild(lazerButton);
+        }   
 });
 //背景でぐるぐる回るやつ
 Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
