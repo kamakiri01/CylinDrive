@@ -1,6 +1,6 @@
 /*
  * this need gl-matrix 1.3.7 or around bersion.
- * 単体で動作するクラスではなく、任意のSpriteｇ継承型クラスに対して
+ * 単体で動作するクラスではなく、任意のSprite継承型クラスに対して
  * 3軸自由度のメソッドと空間管理を行えるよう拡張する。
  */
 //360系クラスのプリミティブ
@@ -13,7 +13,8 @@ var Sprite360 = enchant.Class.create(enchant.Sprite, {
             this.addEventListener('enterframe', function(){
                     this.loop();
             });
-        }, loop: function(){
+        }, 
+        loop: function(){
             Sprite360.loop.call(this);
         }
 });
@@ -26,7 +27,7 @@ Sprite360.loop = function(){
     this.y = axis.y;
     this.z = axis.z; // will not use.
 };
-//その時点での座標をp座標系に登録する
+//その時点での座標をp座標系に登録する(Sprite360へのダックタイピング)
 Sprite360.add360Methods = function(targ){
     targ.px = targ.x;
     targ.py = targ.y;
@@ -106,7 +107,7 @@ Camera360.worldToScreen = function(x, y, z){
         return mat4.multiply(m1, m2, mat4.create());
     }
     var core = enchant.Core.instance;
-    var camera = Camera360.instance;//core.currentScene3D.getCamera();
+    var camera = Camera360.instance;
     // プロジェクション行列
     var pm = mat4.perspective(20, core.width / core.height, 1.0, 1000.0);
     // ビュー行列
@@ -134,6 +135,7 @@ Camera360.setReferenceFromViewPosition = function(x, y){
 //    var pz = Math.sin(theta) * d;
 //    var py = ( Math.cos(theta) + 1/2 ) * scale * core.height;
 //    var pz = ( Math.sin(theta) - 1/2 ) * scale * core.height;
+//    1軸のみの利用を想定して簡易処理
     var py = Math.cos(theta) * d;
     var pz = Math.sin(theta) * d;
 
