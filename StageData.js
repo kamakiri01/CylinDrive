@@ -6,69 +6,115 @@ var setStageEvent = function(scene, stageNumber){
 stageEventData = [];
 //テストモード
 stageEventData[0] = function(scene){
-    //テストとして扇状の弾を撃つ敵をランダムに出現させる
+    //ステージの作成
+    var scene = enchant.Core.instance.currentScene;
+    var speedScale = 10;
     scene.addEventListener('enterframe', function(){
-            var scene = enchant.Core.instance.currentScene;
-            if(scene.age > 60 && scene.age % 30 === 150000000){
+            var age = scene.age * speedScale;
+
+            console.log(age);
+            if(age === 600 || age === 800 || age === 1000){
+                //扇の弾を撃つ敵をランダムな高度にいくつか出現させる
                 Astro360.Methods.Enemy.gemEnemy(
                     Astro360.Enemy.TriangeEnemy,  //三角形エネミー
                     {}, //newの引数
-                    [{x:CORE_WIDTH, y:Math.random()*CORE_HEIGHT/2}], //右端のどこか 
+                    [
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random())*CORE_HEIGHT*4},
+                        {x:CORE_WIDTH, y:(Math.random()-0.5)*CORE_HEIGHT}
+                    ], //右端のどこか 
                     Astro360.EnemyMotion.Simple, //まっすぐ前進
-                    {}, //前進に引数なし
-                    Astro360.EnemyBullet.FanBullet, //扇状の弾のためのバレットクラス
-                    Astro360.EnemyBulletMotion.RippleShot, //扇状に弾を撃つバレットモーション
-                    {freq: 20, num: 5, rad: 20, spd: 15}, //弾の密度と頻度と投射角度
+                    {spd: SPEED_ENEMY0*2, rot: 4},
+                    {},
+                    Astro360.EnemyBulletMotion.NoShot,
+                    {},
                     true //座標系のリファレンス化処理を行う
                 );
             }
-            //Uターンして帰っていく敵の生成テスト
-            if(scene.age > 120 && scene.age % 100 === 100000000){
-                var y = Math.random()*CORE_HEIGHT;
-                var phase;
-                if(y < CORE_HEIGHT/2){
-                    phase = 1;
-                }else{
-                    phase = -1;
-                }
-                var vy = Math.abs( CORE_HEIGHT - y ) / 10;
-                vy *= phase;
+            if(age === 1200){
+                //上に直線で過ぎ去る編隊を出現させる
                 Astro360.Methods.Enemy.gemLinearAccEnemyUnit(
                     Astro360.Enemy.AccEnemy360FixedReference,  //一般的なエネミークラス
                     {
-                        vel:{x:-30,y:vy,z:0
+                        vel:{x:-15,y:0 ,z:0
                         }, 
-                        acc:{x:1,y:0,z:0
+                        acc:{x:0,y:0,z:0
                         }
                     }, //エネミークラスのnew引数
-                    {x:CORE_WIDTH, y: y}, //出現初期位置.[]ではない
-                    5, //とりあえず3体出す
-                    150, //delay
+                    {x:CORE_WIDTH+50, y: 0}, //出現初期位置.[]ではない
+                    20, //編隊の数
+                    100, //delay
                     Astro360.EnemyMotion.Acceleration, //加速度系に属する(初回1度だけ実行)
-                    {}, //エネミーモーションのモーションアーギュメント(使わないと思う)
-                    Astro360.EnemyBullet.TestBullet, //まっすぐ飛ぶバレットクラス
-                    Astro360.EnemyBulletMotion.StraightShot,
-                    {freq: 15, num:1, spd:SPEED_BULLET0},
+                    {}, //加速系なので引数に速度値を含める
+                    {}, 
+                    Astro360.EnemyBulletMotion.NoShot,
+                    {},
                     true
                 );
             }
-            if(scene.age % 30 ===0){
-                Astro360.Methods.Enemy.gemEnemy(
-                    Astro360.Enemy.AccEnemy360,  //一般的なエネミークラス
+            if(age === 2050){
+                //下に直線で過ぎ去る編隊を出現させる
+                Astro360.Methods.Enemy.gemLinearAccEnemyUnit(
+                    Astro360.Enemy.AccEnemy360FixedReference,  //一般的なエネミークラス
                     {
-                        vel:{x:-30,y:10,z:0
+                        vel:{x:-15,y:0 ,z:0
                         }, 
-                        acc:{x:1,y:0,z:0
+                        acc:{x:0,y:0,z:0
                         }
                     }, //エネミークラスのnew引数
-                    [{x:CORE_WIDTH, y: 30}], //出現初期位置
+                    {x:CORE_WIDTH+50, y: CORE_HEIGHT}, //出現初期位置.[]ではない
+                    20, //編隊の数
+                    100, //delay
                     Astro360.EnemyMotion.Acceleration, //加速度系に属する(初回1度だけ実行)
-                    {}, //エネミーモーションのモーションアーギュメント(使わないと思う)
-                    Astro360.EnemyBullet.TestBullet, //まっすぐ飛ぶバレットクラス
-                    Astro360.EnemyBulletMotion.StraightShot,
-                    {freq: 15, num:1, spd:SPEED_BULLET0},
+                    {},
+                    {},
+                    Astro360.EnemyBulletMotion.NoShot,
+                    {},
                     true
                 );
+            }
+            if(age === 2850){
+                //一発で死なない敵がRippleを連射
+                Astro360.Methods.Enemy.gemEnemy(
+                    Astro360.Enemy.AccEnemy360,  //三角形エネミー
+                    {
+                        vel: {x:-4, y:0, z:0
+                        }, 
+                        acc: {x:0, y:0, z:0
+                        }
+                    }, //AccEnemy360クラスのnew引数
+                    [{x:CORE_WIDTH, y:CORE_HEIGHT/2}], //中央に表示
+                    Astro360.EnemyMotion.DoubleAction, 
+                    {
+                        delay: 30,
+                        vel2: {x: 0, y: 0, z: 0},
+                        acc2: {x: 0, y: 0, z: 0},
+                        func: (function(targ){
+                            targ.myBulletFunc = function(){}; //ショット終了
+                            //targ.remove(); //100frameで自己消滅
+                        })
+                    },
+                    Astro360.EnemyBullet.FanBullet, //扇状の弾のためのバレットクラス
+                    Astro360.EnemyBulletMotion.RippleShot, //扇状に弾を撃つバレットモーション
+                    {freq: 5, num: 5, rad: 20, spd: 10}, //弾の密度と頻度と投射角度
+                    true //座標系のリファレンス化処理を行う
+                );
+            }
+
+
+
+
+
+
+
+
+            if(scene.age > 60 && scene.age % 30 === 150000000){
+
             }
     });
 };

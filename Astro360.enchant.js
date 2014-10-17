@@ -292,7 +292,7 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
                 if(this.intersect(enemyClassName.collection[i])) {
                     //破壊エフェクト関数
                     Astro360.Methods.Enemy.gemParticle(enemyClassName.collection[i]);
-                    enemyClassName.collection[i].removeAction();
+                    enemyClassName.collection[i].addDamage(1);
                     this.remove();
                     break;
                 }
@@ -356,7 +356,7 @@ Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
             var bl = breakList.length;
             for(var j = bl - 1;j>=0;j--){
                 Astro360.Methods.Enemy.gemParticle(breakList[j]);
-                breakList[j].removeAction();
+                breakList[j].addDamage(1);
             }
         }
 });
@@ -374,12 +374,19 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
             this.myMotionArg = {};
             this.myBulletFunc = function(){};
             this.myBulletArg = {};
+            this.life = 1;
             this.addEventListener('enterframe', function(){
                     //2Dマッピングで画面外に出たら消える
                     if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
                         this.remove();
                     } 
             });
+        },
+        addDamage: function(param){
+            this.life -= param;
+            if(this.life <= 0){
+                this.removeAction();
+            }
         },
         removeAction: function(){
             enchant.Core.instance.score += 100;
@@ -396,7 +403,7 @@ Astro360.Enemy.EnemyBase360Derivative = enchant.Class.create(Astro360.Enemy.Enem
 //@param
 //{}
 Astro360.Enemy.TriangeEnemy = enchant.Class.create(Astro360.Enemy.EnemyBase360Derivative, {
-        initialize: function(){
+        initialize: function(argObj){
             Astro360.Enemy.EnemyBase360Derivative.call(this, 20, 20);
             var sf = new Surface(20, 20);
             this.image = sf;
@@ -408,6 +415,10 @@ Astro360.Enemy.TriangeEnemy = enchant.Class.create(Astro360.Enemy.EnemyBase360De
             this.sCtx.closePath();
             this.sCtx.stroke();
             this.frame = 7;
+            //もしlife定義があれば使用
+            if(argObj.life !== undefined){
+                this.life = argObj.life;
+            }
         }
 });
 //加速度系処理を行う敵クラス(new時点のcore.thetaを参照)
@@ -446,6 +457,11 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.accX = accObj.x;
             this.accY = accObj.y;
             this.accZ = accObj.z;
+
+            //もしlife定義があれば使用
+            if(argObj.life !== undefined){
+                this.life = argObj.life;
+            }
         }
 });
 //加速度系処理を行う敵クラス。ただし、new時点のcore.thetaを参照しない。
@@ -485,6 +501,10 @@ Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.E
             this.accX = accObj.x;
             this.accY = accObj.y;
             this.accZ = accObj.z;
+            //もしlife定義があれば使用
+            if(argObj.life !== undefined){
+                this.life = argObj.life;
+            }
     }
 });
 //-------------------------------------------------------
@@ -498,6 +518,7 @@ Astro360.Effect.breakParticleDot = enchant.Class.create(Dot, {
         this.age = 0;
         this.x = e.x;
         this.y = e.y;
+        this.polarT = Math.random() * Math.PI;
         this.polarR = Math.round(Math.random()* 2)+Math.random();
         this.accX = Math.round(scr * Math.cos(this.polarT));
         this.accY = Math.round(scr * Math.sin(this.polarT));
@@ -556,10 +577,10 @@ Astro360.EnemyBullet.FanBullet = enchant.Class.create(Astro360.EnemyBullet.Bulle
 //Astro360.EnemyMotion //敵スプライトの移動モーション管理3D
 //-------------------------------------------------------
 //ただまっすぐ進むモーション
-Astro360.EnemyMotion.Simple = function(enem){
+Astro360.EnemyMotion.Simple = function(enem, argObj){
     enem.addEventListener('enterframe', function(){
-            enem.px -= SPEED_ENEMY0;
-            enem.rotation -= 1;
+            enem.px -= argObj.spd;
+            enem.rotation -= argObj.rot;
     });
 };
 //加速度系を持たせる基本モーション
@@ -572,11 +593,57 @@ Astro360.EnemyMotion.Acceleration = function(enem){
             enem.py += enem.velY;
             enem.pz += enem.velZ;
     });
-    
+};
+//途中で一度方向転換するモーション
+//@param
+//motionArg = {delay: int,
+//              vx2~az2: int,
+//             function: func(enem),
+//             }
+Astro360.EnemyMotion.DoubleAction = function(enem, motionArg){
+    var delay = motionArg.delay;
+//    var vx1 = motionArg.vx1;
+//    var vy1 = motionArg.vy1;
+//    var vz1 = motionArg.vz1;
+//    var ax1 = motionArg.ax1;
+//    var ay1 = motionArg.ay1;
+//    var az1 = motionArg.az1;
+    var vx2 = motionArg.vel2.x;
+    var vy2 = motionArg.vel2.y;
+    var vz2 = motionArg.vel2.z;
+    var ax2 = motionArg.acc2.x;
+    var ay2 = motionArg.acc2.y;
+    var az2 = motionArg.acc2.z;
+    var func;
+    if(motionArg.func !==undefined){
+        func = motionArg.func;
+    }
+    enem.addEventListener('enterframe', function(){
+            if(enem.age === delay){
+                enem.velX = vx2;
+                enem.velY = vy2;
+                enem.velZ = vz2;
+                enem.accX = ax2;
+                enem.accY = ay2;
+                enem.accZ = az2;
+                if(func !== undefined){
+                    func(enem);
+                }
+            }
+            enem.velX += enem.accX;
+            enem.velY += enem.accY;
+            enem.velZ += enem.accZ;
+            enem.px += enem.velX;
+            enem.py += enem.velY;
+            enem.pz += enem.velZ;
+    });
 };
 //-------------------------------------------------------
 //Astro360.EnemyBulletMotion //敵のショットモーション（タイミング含む）
 //-------------------------------------------------------
+//何も撃たないモーション
+Astro360.EnemyBulletMotion.NoShot= function(){
+};
 //直進弾を撃つモーション
 //argobj = {spd: int, freq: int}
 Astro360.EnemyBulletMotion.StraightShot= function(enem, argObj){
@@ -771,7 +838,6 @@ Astro360.UI.UiBg = enchant.Class.create(enchant.Group, {
                     var c = Camera360.instance;
                     var theta = c.theta;
                     var theta_height = e.y / CORE_HEIGHT;
-                    console.log(theta);
                     //前フレームのグラデーションの削除
                     ctx.clearRect(3, 3, UI_WIDTH-6, CORE_HEIGHT-6);
                     //グラデーションの更新
