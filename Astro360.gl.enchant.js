@@ -124,20 +124,6 @@ Astro360.gl.UI.MainBg3D = enchant.Class.create(enchant.gl.Scene3D, {
             c.y = -10;
             c.z = 0;
             scene3d.addChild(c);
-
-//            //シリンダー内壁にあるブロック
-//            var len = 0;
-//            var distScale = 0.7;
-//            for(var i=0;i<len;i++){
-//                var polarT = Math.random() * Math.PI*2;
-//                var polarR = GL_CAMDIST;
-//
-//                var b = new Astro360.gl.UI.BgWallCube(10, "#ff3333");
-//                b.x = 0;//Math.random() * 100;
-//                b.y = 0;// Math.round(polarR * Math.cos(polarT)) * distScale; 
-//                b.z = 0;//Math.round(polarR * Math.sin(polarT)) * distScale;
-//                scene3d.addChild(b);
-//            }
             
             //3dカメラの回転追従処理
             core.currentScene.addEventListener('enterframe', function() {

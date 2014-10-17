@@ -259,11 +259,17 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
             this.compositeOperation = 'lighter';
             var sf = new enchant.Surface(96, 32);
             var ctx = sf.context;
-            ctx.beginPath();
+            //ctx.beginPath();
             ctx.fillStyle = ColorSet.PLAYERBULLET;
             ctx.scale(1.8, 0.6);
-            ctx.arc(30,35,15,0,Math.PI*2,false);
-            ctx.stroke();
+            //ctx.arc(30,35,15,0,Math.PI*2,false);
+            //ctx.stroke();
+                var rad = 16;
+                ctx.beginPath();
+                ctx.arc(rad, rad, rad, 0, Math.PI*2, true);
+                ctx.arc(rad, rad, rad-4, 0, Math.PI*2, false);
+                ctx.closePath();
+                ctx.fill();
             this.frame = Astro360.PlayerBullet.PlayerNormalBullet.collection.length % 3; 
             //this.frame =  Math.round(Math.random()) % 3;
             //this.scaleY = Math.round(Math.random() + 1) / 2;
@@ -410,10 +416,12 @@ Astro360.Enemy.TriangeEnemy = enchant.Class.create(Astro360.Enemy.EnemyBase360De
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
             this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
+            this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
             this.sCtx.closePath();
-            this.sCtx.stroke();
+            //this.sCtx.stroke();
+            this.sCtx.fill();
             this.frame = 7;
             //もしlife定義があれば使用
             if(argObj.life !== undefined){
@@ -436,17 +444,22 @@ Astro360.Enemy.AccEnemy360 = enchant.Class.create(Astro360.Enemy.EnemyBase360Der
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
+            this.sCtx.strokeStyle= ColorSet.ENEMY_ACCENEMY;
             this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
             this.sCtx.closePath();
-            this.sCtx.stroke();
+            //this.sCtx.stroke();
+            this.sCtx.fill();
             this.frame = 7;
 
             var core = enchant.Core.instance;
-            var accObj = Camera360.setReferenceFromViewPosition(argObj.acc.x, argObj.acc.y + core.height/2);
-            var velObj = Camera360.setReferenceFromViewPosition(argObj.vel.x, argObj.vel.y + core.height/2);
+            var accObj = Camera360.setReferenceFromViewPosition(
+                argObj.acc.x, 
+                argObj.acc.y + core.height/2);
+            var velObj = Camera360.setReferenceFromViewPosition(
+                argObj.vel.x, 
+                argObj.vel.y + core.height/2);
             //px系はgemEnemyでのみ設定される
             this.px = 0; //posObj.x;
             this.py = 0; //posObj.y;
@@ -481,12 +494,12 @@ Astro360.Enemy.AccEnemy360FixedReference = enchant.Class.create(Astro360.Enemy.E
             this.image = sf;
             this.sCtx = sf.context;
             this.sCtx.beginPath();              
-            this.sCtx.strokeStyle= ColorSet.ENEMY_TRIANGLE;
+            this.sCtx.strokeStyle= ColorSet.ENEMY_ACCENEMY;
             this.sCtx.moveTo(12, 1);
             this.sCtx.lineTo(20, 15);
             this.sCtx.lineTo(4, 15);
             this.sCtx.closePath();
-            this.sCtx.stroke();
+            this.sCtx.fill();
             this.frame = 7;
 
             var velObj = argObj.vel;

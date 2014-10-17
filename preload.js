@@ -35,11 +35,12 @@ ColorSet.STARTSCENE_SELECTOR1 = 'rgba(256,256,256,1)';
 
 //Astro360
 //PlayerBullet
-ColorSet.PLAYERBULLET = "rgba(1, 1, 1, 1)";
+ColorSet.PLAYERBULLET = "rgb(255, 255, 255)";
 ColorSet.PLAYERLAZER0 = 'rgb(128, 100, 162)';
 ColorSet.PLAYERLAZER1 = 'rgb(255, 255, 255)';
 //Enemy
 ColorSet.ENEMY_TRIANGLE = "#3333ff";
+ColorSet.ENEMY_ACCENEMY = "#11ff22";
 //UI
 ColorSet.UIBORDER = "rgba(1, 1, 1, 1)";
 ColorSet.UIBG0 = "rgba(1,   128, 100, 162)"; //背景色
@@ -53,6 +54,6 @@ ColorSet.SCORELABEL = "red";
 
 //Astro360.gl
 //BgWallCylinder
-ColorSet.BGWALL0 = 'rgb(188, 100, 122)';
-ColorSet.BGWALL1 = 'rgb(255, 255, 255)';
+ColorSet.BGWALL0 = 'rgb(18, 106, 202)';
+ColorSet.BGWALL1 = 'rgb(205, 205, 255)';
 
