@@ -13,6 +13,7 @@ var SPEED_BULLET0 = 11;
 var CORE_WIDTH = 640;
 var CORE_HEIGHT = 640;
 var UI_WIDTH = 70;
+var MAIN_WIDTH = CORE_WIDTH - UI_WIDTH;
 
 //レーザーゲージ
 var GAUGE_WIDTH = 50;

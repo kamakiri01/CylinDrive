@@ -13,14 +13,17 @@ window.onload = function(){
         core.sceneManager.pushGroup(new StartScene());
     };
     core.endFunc = function(){
-        var score = PlayScene.instance.age / core.fps;
-        score = Math.round(score * 10) / 10;
-        core.end(score, score + "秒でトライアルクリア");
+        var score = core.score;
+        var p = Astro360.Player.PlayerBase.instance;
+        var lestPlayer = p.lestPlayer
+        var scoreLestPlayer = Math.round(lestPlayer * 100);
+        var finalScore = score + scoreLestPlayer;
+        core.end(score, score + "スコア、残機" + lestPlayer + "機");
     };
     core.endFunc2 = function(){
         var score = PlayScene.instance.age / core.fps;
         score = Math.round(score * 10) / 10;
-        core.end(0, score + "秒で撃墜された");
+        core.end(score, score + "秒で撃墜された");
     };
     core.start();
 };

@@ -106,8 +106,8 @@ Camera360.prototype.delayRot = function(targetTheta, pastTheta, delay){
     var c = Camera360.instance;
     c.rotX(Math.PI/90);
     var past = pastTheta + 1;
-    if(pastTheta < targetTheta){
-        setTimeout("Camera360.instance.delayRot(" + targetTheta + ", " + past + ")", delay);
+    if(pastTheta < Math.abs(targetTheta)){
+        setTimeout("Camera360.instance.delayRot(" + (targetTheta) + ", " + past + ")", delay);
     }
 }
 Camera360.worldToScreen = function(x, y, z){

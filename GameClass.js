@@ -42,7 +42,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         var trial = new Label("");
         trial.font = "32px sans bold";
         trial.color = ColorSet.STARTSCENE_TEXT_ENABLE;
-        trial.text = "TRIAL MODE";
+        trial.text = "ARCADE MODE";
         trial.y = 300;
         this.addChild(trial);
         trial.x = core.width/2 - trial.width/2;
