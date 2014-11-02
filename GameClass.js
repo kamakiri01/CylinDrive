@@ -212,6 +212,7 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 
 //------------------------------------------------------
         var p = new Astro360.Player.PlayerBase();
+        Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
         p.x = 150;
         p.y = CORE_HEIGHT /2;
         p.targX = 150;

@@ -142,7 +142,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             //自身のタッチエンド
             this.receiveOwnTouchEnd[0] = function(e){
                 //ショット停止
-                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
+                //Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
             //フィールドのタッチスタート
             this.receiveFieldTouchStart[0] = function(e){
@@ -156,7 +156,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             //フィールドのタッチエンド
             this.receiveFieldTouchEnd[0] = function(e){
                 //ショット停止
-                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
+                //Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
 //-------------------------------------------------------
 // タッチとイベント処理パターン2
