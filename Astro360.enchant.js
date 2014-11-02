@@ -116,6 +116,9 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
 //-------------------------------------------------------
 // タッチとイベント処理パターン1
 //-------------------------------------------------------
+            this.receiveEnterframeEvent[0] = function(e){
+                Astro360.Player.PlayerBase.instance.receiveToMove(e);
+            },
             //自身のタッチスタート
             this.receiveOwnTouchStart[0] = function(e){
                 //移動
@@ -146,6 +149,16 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             };
             //フィールドのタッチスタート
             this.receiveFieldTouchStart[0] = function(e){
+                //残弾があればレーザー発射
+                if(Astro360.Player.PlayerBase.instance.stockLazer >= 1){
+                    //レーザー中でなければ発射処理開始
+                    if(Astro360.Player.PlayerBase.instance.isDuringLazer === false){
+                        Astro360.Player.PlayerBase.instance.isDuringLazer = true; //レーザー
+                        Astro360.Player.PlayerBase.instance.stockLazer -= 1; //残弾消費
+                        Astro360.Player.PlayerBase.instance.shotLazer();
+                    }
+                }else{
+                }
                 Astro360.Player.PlayerBase.instance.receiveToMove(e);
                 Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
             };//フィールドのタッチムーブ
@@ -161,6 +174,9 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
 //-------------------------------------------------------
 // タッチとイベント処理パターン2
 //-------------------------------------------------------
+            this.receiveEnterframeEvent[1] = function(e){
+                Astro360.Player.PlayerBase.instance.receiveToMove(e);
+            },
             //タッチとショットの処理
             this.receiveOwnTouchStart[1] =  function(e){
                 console.log("ownStart2");
@@ -226,6 +242,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
 //-------------------------------------------------------
 // タッチとイベント処理パターン1
 //-------------------------------------------------------
+        receiveEnterframeEvent: [],
         receiveOwnTouchStart: [],
         receiveOwnTouchMove:  [],
         receiveOwnTouchEnd:   [], 

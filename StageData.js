@@ -83,7 +83,7 @@ stageEventData[0] = function(scene){
                 Astro360.Methods.Enemy.gemEnemy(
                     Astro360.Enemy.AccEnemy360,  //三角形エネミー
                     {
-                        life: 30,
+                        life: 5,
                         vel: {x:-4, y:0, z:0
                         }, 
                         acc: {x:0, y:0, z:0

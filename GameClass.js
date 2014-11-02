@@ -221,6 +221,9 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 //------------------------------------------------------
 // プレイヤータッチイベント定義
 //------------------------------------------------------
+//        p.addEventListener('enterframe', function(e){
+//                p.receiveEnterframeEvent[core.conf.ui](e);
+//        });
         p.addEventListener('touchstart', function(e){
                 p.receiveOwnTouchStart[core.conf.ui](e);
         });
