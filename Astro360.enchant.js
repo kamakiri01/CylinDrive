@@ -97,9 +97,10 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             PlayScene.instance.mainWindow.addChild(s);
         },
         shotN: function(n){
+            var timeOut = 200;
             this.shot1();
             if(n-1 > 0){
-                setTimeout("Astro360.Player.PlayerBase.instance.shotN(" + n + "-1)", 300);
+                setTimeout("Astro360.Player.PlayerBase.instance.shotN(" + n + "-1)", timeOut);
             }
         },
         shotLazer: function(){

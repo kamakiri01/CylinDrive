@@ -81,8 +81,9 @@ Astro360.gl.UI.BgWallCylinder = enchant.Class.create(enchant.gl.primitive.Cylind
             })
             this.moved = 0;
             this.addEventListener('enterframe' ,function(){
-                    this.y += 1;
-                    this.moved += 1;
+                    var rate = 3; //this param have to times by 3.
+                    this.y += rate;
+                    this.moved += rate;
                     if(this.moved >= 27){
                         this.y -= 27;
                         this.moved = 0;
