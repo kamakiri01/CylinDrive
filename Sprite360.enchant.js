@@ -38,6 +38,16 @@ Sprite360.add360Methods = function(targ){
         Sprite360.loop.call(this);
     });
 };
+//その時点で描画されている画面内に自分が存在するか確認する
+Sprite360.prototype.isInsideWindow = function(){
+    var core = enchant.Core.instance;
+    var result = true;
+    var checkX = (this.x >  0) && (this.x < core.width);
+    var checkY = (this.y >  0) && (this.y < core.height);
+    result = checkX && checkY;
+    return result;
+};
+
 //カメラのシングルトン
 var Camera360 = function(conf){
     if(Camera360.instance === undefined){

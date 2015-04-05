@@ -151,7 +151,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         });
     }
 });
-
+//ゲーム本編の画面全体を持つグループクラス
 var PlayScene = enchant.Class.create(enchant.Group, {
     initialize: function(){
         enchant.Group.call(this);
@@ -159,30 +159,31 @@ var PlayScene = enchant.Class.create(enchant.Group, {
         var core = enchant.Core.instance;
         var scene = core.currentScene;
         scene.addChild(this);
-        var cameraConf = {
-            x: core.width / 2,
-            y: 0,
-            z: -core.height * 5,
-            centerX: core.width / 2,
-            centerY: 0,
-            centerZ: 0,
-            upVectorX: 0,
-            upVectorY: -1,
-            upVectorZ: 0
-        };
-        var camera = new Camera360(cameraConf);
+        var camera = new Camera360(CAMERACONF);
         //メインとUIのグループを定義
+        //ゲーム構成部品のグループ
         var mainWindow = new enchant.Group();
+        //回転などのUI部品のグループ
         var uiWindow = new enchant.Group();
         this.mainWindow = mainWindow;
         this.uiWindow = uiWindow;
         mainWindow.x = UI_WIDTH;
         this.addChild(mainWindow);
         this.addChild(uiWindow);
-
+        //背景効果のグループ
         var mainBg = new Astro360.UI.MainBg();
         mainWindow.addChild(mainBg);
 
+        //Vertical用のEdgeUI
+        var leftEdgeUI = new Astro360.UI.EdgeSwipeArea();
+        leftEdgeUI.x = 0;
+        leftEdgeUI.y = 0;
+        var rightEdgeUI = new Astro360.UI.EdgeSwipeArea();
+        rightEdgeUI.x = CORE_WIDTH - EdgeSwipeAreaWidth;
+        rightEdgeUI.y = 0;
+        uiWindow.addChild(leftEdgeUI);
+        uiWindow.addChild(rightEdgeUI);
+        /*
         //PC操作系の場合
         if(core.conf.ui === 0){
             var uiBg = new Astro360.UI.UiBg();
@@ -192,7 +193,7 @@ var PlayScene = enchant.Class.create(enchant.Group, {
             var uiBg = new Astro360.UI.UiBgSP();
             uiWindow.addChild(uiBg);
         }
-
+        */
         var gage = new Astro360.UI.LazerGauge();
         mainWindow.addChild(gage);
 
@@ -210,7 +211,9 @@ var PlayScene = enchant.Class.create(enchant.Group, {
         //Dot.surface参照が切れる不都合対応
         var d = new Dot();
 
-//------------------------------------------------------
+        //------------------------------------------------------
+        //プレイヤーの生成
+        //------------------------------------------------------
         var p = new Astro360.Player.PlayerBase();
         Astro360.Player.PlayerBase.instance.isShouldNormalShot = true;
         p.x = 150;
@@ -254,26 +257,41 @@ var PlayScene = enchant.Class.create(enchant.Group, {
         mainWindow.addEventListener('touchend', function(e){
                 p.receiveFieldTouchEnd[core.conf.ui](e);
         });
-//------------------------------------------------------
-// UiWindowタッチイベント定義
-//------------------------------------------------------
-        //PC操作系の場合
-        if(core.conf.ui === 0){
-            //UIタッチ操作で回転させる
-            uiWindow.addEventListener('touchstart', function(e){
-                    uiWindow.currentTouchY = e.y;
-            });
-            uiWindow.addEventListener('touchmove', function(e){
-                    var rotScale = 0.2;
-                    var diff = e.y - uiWindow.currentTouchY;
-                    Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
-                    uiWindow.currentTouchY = e.y;
-            });
-            uiWindow.addEventListener('touchend', function(e){
-                    uiWindow.currentTouchY = 0;
-            });
-        }
-        //スマホ操作系はGroup側で別個にイベント定義するのでGameClassからは触れない
+        //------------------------------------------------------
+        // UiWindowタッチイベント定義
+        //------------------------------------------------------
+
+        uiWindow.addEventListener('touchstart', function(e){
+                uiWindow.currentTouchX = e.x;
+        });
+        uiWindow.addEventListener('touchmove', function(e){
+                var rotScale = 0.2;
+                var diff = e.x - uiWindow.currentTouchX;
+                Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
+                uiWindow.currentTouchX = e.x;
+        });
+        uiWindow.addEventListener('touchend', function(e){
+                uiWindow.currentTouchY = 0;
+        });
+        /*
+         //PC操作系の場合
+         if(core.conf.ui === 0){
+             //UIタッチ操作で回転させる
+             uiWindow.addEventListener('touchstart', function(e){
+                     uiWindow.currentTouchY = e.y;
+             });
+             uiWindow.addEventListener('touchmove', function(e){
+                     var rotScale = 0.2;
+                     var diff = e.y - uiWindow.currentTouchY;
+                     Camera360.instance.rotX(Math.PI/90 * diff * rotScale);
+                     uiWindow.currentTouchY = e.y;
+             });
+             uiWindow.addEventListener('touchend', function(e){
+                     uiWindow.currentTouchY = 0;
+             });
+         }
+         //スマホ操作系はGroup側で別個にイベント定義するのでGameClassからは触れない
+*/
 //------------------------------------------------------
 //ステージ構成
         setStageEvent(this, 0); //StageData.jsからステージデータを読み込む

@@ -1,5 +1,5 @@
 //ALL ENVIRONMENT
-
+var ENV = {};
 //外部画像読み込み
 var IMAGE_PRELOAD = [];
 var TITLE_IMG = "./images/cyt.png";
@@ -15,10 +15,26 @@ var CORE_HEIGHT = 640;
 var UI_WIDTH = 70;
 var MAIN_WIDTH = CORE_WIDTH - UI_WIDTH;
 
+var CAMERACONF = {
+    x: CORE_WIDTH / 2,
+    y: 0,
+    z: - CORE_HEIGHT * 5,
+    centerX: CORE_WIDTH / 2,
+    centerY: 0,
+    centerZ: 0,
+    upVectorX: 1, //Vertical用
+    upVectorY: 0, //Horizontal用
+    upVectorZ: 0
+};
+
 //レーザーゲージ
 var GAUGE_WIDTH = 50;
 var GAUGE_HEIGHT = 20;
 var MAX_LAZER_STOCK = 6;
+
+
+//EdgeSwipeAreaのwidth
+var EdgeSwipeAreaWidth = 50;
 
 GL_CAMDIST = 90;
 GL_SCALE_WALLCUBE = 1;

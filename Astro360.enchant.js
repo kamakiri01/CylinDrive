@@ -28,7 +28,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             Astro360.Player.PlayerBase.instance = this;
             this.targX = this.x;
             this.targY = this.y;
-            this.stockLazer = 1;
+            this.stockLazer = 1; //初期ストック1
             this.isShouldNormalShot = false; //レーザー、とショットの切り替え、タッチ操作状態変数
             this.isDuringLazer = false;
             this.lestSafeTime = 0;
@@ -52,7 +52,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             if(this.stockLazer < MAX_LAZER_STOCK){
                 this.stockLazer += 0.01;
             }
-            //あたり判定
+            //あたり判定を取る条件
             if(this.lestSafeTime <= 0 && this.isDuringLazer === false){
                 this.checkIntersectWithEnemy();
             }
@@ -65,6 +65,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
                 this.lestSafeTime = 0;// 通常時
             }
         },
+        //あたり判定処理
         checkIntersectWithEnemy: function(){
             //敵と弾全体に判定を取る
             this._checkIntersectWithEnemy(Astro360.Enemy.EnemyBase360);
@@ -79,20 +80,22 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
                 }
             }
         },
+        //プレイヤーと敵のあたり判定を取る
         doIntersectWithEnemy: function(){
             this.lestPlayer -= 1;
             if(this.lestPlayer >= 0){
                 this.lestSafeTime += 30;
             }else{
-                //ゲーム終了を呼び出す
+                //残機がなければゲーム終了を呼び出す
                 enchant.Core.instance.endFunc2();
             }
         },
+        //一発ショットを打つ
         shot1: function(){
             var s = new Astro360.PlayerBullet.PlayerNormalBullet();
             var p = Astro360.Player.PlayerBase.instance;
             //出現点を自機より前に取る
-            s.x = p.x + p.width;
+            s.x = p.x + 2;
             s.y = p.y + p.height/2 - s.height/2 - 6;
             PlayScene.instance.mainWindow.addChild(s);
         },
@@ -108,14 +111,12 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             var p = Astro360.Player.PlayerBase.instance;
             lazer.x = p.x + p.width;
             lazer.y = p.y;
-            //出現点を自機より前に取る
-            //s.y = p.y + p.height/2 - s.height/2;
             PlayScene.instance.mainWindow.addChild(lazer);
         },
         //タッチイベントの処理をインスタンスにセットする
         setTouchEventArray: function(){
 //-------------------------------------------------------
-// タッチとイベント処理パターン1
+// タッチとイベント処理パターン1(旧PC用UI)
 //-------------------------------------------------------
             this.receiveEnterframeEvent[0] = function(e){
                 Astro360.Player.PlayerBase.instance.receiveToMove(e);
@@ -173,7 +174,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
                 //Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
 //-------------------------------------------------------
-// タッチとイベント処理パターン2
+// タッチとイベント処理パターン2(旧スマホ用UI)
 //-------------------------------------------------------
             this.receiveEnterframeEvent[1] = function(e){
                 Astro360.Player.PlayerBase.instance.receiveToMove(e);
@@ -207,7 +208,7 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             this.receiveOwnTouchEnd[1] = function(e){
                 console.log("ownEnd2");
                 //TODO: 相対移動(fieldと同等)
-                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
+                //Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
 
             this.receiveFieldTouchStart[1] = function(e){
@@ -237,11 +238,11 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             this.receiveFieldTouchEnd[1] = function(e){
                 console.log("fieldEnd2");
                 //TODO: ショット停止
-                Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
+                //Astro360.Player.PlayerBase.instance.isShouldNormalShot = false;
             };
         },
 //-------------------------------------------------------
-// タッチとイベント処理パターン1
+// タッチとイベント処理パターン
 //-------------------------------------------------------
         receiveEnterframeEvent: [],
         receiveOwnTouchStart: [],
@@ -298,9 +299,9 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
         },
         //バレットのモーション
         loop: function(){
-            this.x += 50; //速度
+            this.y -= 50; //速度
             this.checkIntersect();
-            if(this.y > CORE_WIDTH){
+            if(this.y < 0){
                 this.remove();
             }
         },
@@ -325,42 +326,42 @@ Astro360.PlayerBullet.PlayerNormalBullet = enchant.Class.create(enchant.Sprite, 
 //プレイヤーのレーザー
 Astro360.PlayerBullet.PlayerLazer = enchant.Class.create(enchant.Sprite, {
         initialize: function(){
-            enchant.Sprite.call(this, CORE_WIDTH, 32);
+            enchant.Sprite.call(this, 32, CORE_HEIGHT);
             this.opacity = 0.5;
             this.age = 0;
             this.compositeOperation = 'lighter';
-            var sf = new enchant.Surface(CORE_WIDTH, 32);
+            var sf = new enchant.Surface(32, CORE_HEIGHT);
             var ctx = sf.context;
             ctx.beginPath();
 
-            var grad  = ctx.createLinearGradient(0,0, 0, 32);
+            var grad  = ctx.createLinearGradient(0,0, 32, 0);
             grad.addColorStop(0,   ColorSet.PLAYERLAZER0);  // 紫
             grad.addColorStop(0.5, ColorSet.PLAYERLAZER1); // 緑
             grad.addColorStop(1,   ColorSet.PLAYERLAZER0);  // 紫
             /* グラデーションをfillStyleプロパティにセット */
             ctx.fillStyle = grad;
-            ctx.rect(0,0, CORE_WIDTH,32);
+            ctx.rect(0,0, 32, CORE_HEIGHT);
             ctx.fill();
             //モーションループ
             this.addEventListener('enterframe', function(){
                     this.loop();
             });
             this.image = sf;
-            this.scaleY = 0;
+            this.scaleX = 0;
         },
         //レーザーのモーション
         loop: function(){
             this.age += 1;
-            this.opacity = this.scaleY * 0.6; 
+            this.opacity = this.scaleX * 0.6; 
             this.checkIntersectLazer();
             if(this.age > 40){
                 this.removeLazer();
                 this.remove();
             }
             var p = Astro360.Player.PlayerBase.instance;
-            this.x = p.x + p.width;
-            this.y = p.y;
-            this.scaleY = Math.sin(this.age/40 * Math.PI);
+            this.x = p.x;
+            this.y = p.y - CORE_HEIGHT;
+            this.scaleX = Math.sin(this.age/40 * Math.PI);
         },
         removeLazer: function(){
             Astro360.Player.PlayerBase.instance.isDuringLazer = false; //レーザー発射判定
@@ -400,9 +401,12 @@ Astro360.Enemy.EnemyBase360 = enchant.Class.create(Sprite360, {
             this.life = 1;
             this.addEventListener('enterframe', function(){
                     //2Dマッピングで画面外に出たら消える
-                    if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
+                    if(this.isInsideWindow() === false){
                         this.remove();
-                    } 
+                    }
+                 //   if(this.x < 0 || this.x > core.width || this.y < 0 || this.y > core.height){
+                 //       this.remove();
+                 //   } 
             });
         },
         addDamage: function(param){
@@ -983,16 +987,31 @@ Astro360.UI.UiBgSP = enchant.Class.create(enchant.Group, {
                 //レーザー発射
                 var p = Astro360.Player.PlayerBase.instance;
                 p.receiveOwnTouchStart[1]({x:p.x + UI_WIDTH + 16, y:p.y + 16});
-
             });
-
-
-
             this.addChild(upButton);
             this.addChild(downButton);
             this.addChild(lazerButton);
         }   
 });
+
+//画面上下端からスワイプで回転させる領域のクラス
+Astro360.UI.EdgeSwipeArea = enchant.Class.create(enchant.Group, {
+        initialize: function(){
+            enchant.Group.call(this);
+            var area = new Sprite( EdgeSwipeAreaWidth, CORE_HEIGHT);
+            var sf = new Surface(EdgeSwipeAreaWidth, CORE_HEIGHT);
+            var ctx = sf.context;
+            //外枠を黒塗り
+            ctx.fillStyle = ColorSet.UIBORDER;
+            ctx.fillRect(0, 0, EdgeSwipeAreaWidth, CORE_HEIGHT);
+            ctx.fillStyle = ColorSet.UIBUTTON;
+            ctx.fillRect(3,3, EdgeSwipeAreaWidth-6, CORE_HEIGHT - 6);
+            area.image = sf;
+            this.addChild(area);
+        }
+});
+
+
 //背景でぐるぐる回るやつ
 Astro360.UI.MainBg = enchant.Class.create(enchant.Group, {
         initialize: function(){
