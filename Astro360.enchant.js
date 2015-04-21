@@ -93,7 +93,6 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
             var distY = Math.abs(player.y - ecy);
             if(distX + distY < 4){ //当たり判定粒度
                 result = true;
-                console.log("intersect");
             }else{
                 result = false;
             }
