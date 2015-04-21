@@ -73,14 +73,33 @@ Astro360.Player.PlayerBase = enchant.Class.create(Geo.Circle2, {
         _checkIntersectWithEnemy: function(enemyClassName){
             var il = enemyClassName.collection.length;
             for(var i=0;i<il;i++){
-                if(this.intersect(enemyClassName.collection[i])){
+                var flag = this.checkPlayerIntersect(enemyClassName.collection[i], this);
+                // if(this.intersect(enemyClassName.collection[i])){
+                if(flag === true){
                     //破壊処理
                     this.doIntersectWithEnemy();
                     break;
                 }
             }
         },
-        //プレイヤーと敵のあたり判定を取る
+        //プレイヤー用の当たり判定処理（1ドット単位判定）
+        checkPlayerIntersect(enem, player){
+            var result = false;
+            var ew = enem._width;
+            var eh = enem._height;
+            var ecx = enem.x + Math.round(ew/2);
+            var ecy = enem.y + Math.round(eh/2);
+            var distX = Math.abs(player.x - ecx);
+            var distY = Math.abs(player.y - ecy);
+            if(distX + distY < 4){ //当たり判定粒度
+                result = true;
+                console.log("intersect");
+            }else{
+                result = false;
+            }
+            return result;
+        },
+        //衝突時の処理
         doIntersectWithEnemy: function(){
             this.lestPlayer -= 1;
             if(this.lestPlayer >= 0){
