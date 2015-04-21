@@ -4,7 +4,7 @@ window.onload = function(){
     core.fps = 30;
     core.score = 0;
         core.conf = {}; //TODO仮置きオブジェクト
-        core.conf.ui = 0;
+        core.conf.ui = 1;
     core.keyEvent = [];
     initKeyEvents();
     core.preload(IMAGE_PRELOAD);

@@ -85,7 +85,7 @@ var StartScene = enchant.Class.create(enchant.Group, {
         var conf = new Label("");
         conf.font = "32px sans bold";
         conf.color = ColorSet.STARTSCENE_TEXT_ENABLE;
-        conf.text = "CONFIG:PC MODE";
+        conf.text = "CONFIG:TOUCH MODE";
         conf.y = 500;
         this.addChild(conf);
         conf.x = core.width/2 - conf.width/2;
@@ -228,7 +228,7 @@ var PlayScene = enchant.Class.create(enchant.Group, {
 //                p.receiveEnterframeEvent[core.conf.ui](e);
 //        });
         p.addEventListener('touchstart', function(e){
-                p.receiveOwnTouchStart[core.conf.ui](e);
+                //p.receiveOwnTouchStart[core.conf.ui](e);
         });
         p.addEventListener('touchmove', function(e){
                 p.receiveOwnTouchMove[core.conf.ui](e);
@@ -242,7 +242,23 @@ var PlayScene = enchant.Class.create(enchant.Group, {
             var e2y  =e.y / enchant.Core.instance.scale; 
             var obj = {x: e2x, y: e2y};
 //            p.receiveFieldTouchMove[core.conf.ui](obj); //マウス自動追従をやめている
-        };
+};
+
+//------------------------------------------------------
+// ダブルタップイベント定義
+//------------------------------------------------------
+        //ダブルタップイベントの定義
+        enchant.annex.DoubleTap.setDoubleTapHandler(this);
+        //リスナー生成
+        this.addEventListener('doubletapstart', function(e){
+                console.log("doubletapstart");
+                //ダブルタップ時にはレーザー処理
+                p.receiveOwnTouchStart[core.conf.ui](e); //uiモード変更しないこと
+        });
+        this.addEventListener('doubletapend', function(e){
+                console.log("doubletapend");
+        });
+
 //------------------------------------------------------
 // MainWindowフィールドタッチイベント定義
 //------------------------------------------------------
